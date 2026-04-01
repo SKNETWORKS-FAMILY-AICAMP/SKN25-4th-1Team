@@ -1,0 +1,51 @@
+# ==========================================
+# 1. Environment Variables
+# ==========================================
+.env
+*.local
+
+# ==========================================
+# 2. Python & Virtual Environment
+# ==========================================
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+
+
+# ==========================================
+# 3. Data & Vector Store (ChromaDB)
+# ==========================================
+# 데이터베이스 물리 파일 및 원본/가공 데이터 무시
+# data/raw/*
+# data/processed/*
+# data/vector_store/*
+
+# !data/raw/.gitkeep
+# !data/processed/.gitkeep
+# !data/vector_store/.gitkeep
+
+# 업로드하신 FAQ 데이터 등 로컬 데이터 파일 무시
+*.csv
+*.xlsx
+*.pdf
+*.json
+
+.vscode/
+
