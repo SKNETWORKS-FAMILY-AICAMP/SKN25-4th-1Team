@@ -1,54 +1,91 @@
-# CLI 기반 검색 테스트용
-
 import sys
 import os
 from dotenv import load_dotenv
 
-from src.pipelines.embedding_pipeline import get_vector_store
+# 1. 모듈 경로 설정 (src 폴더 접근용)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(current_dir)
+if root_dir not in sys.path:
+    sys.path.append(root_dir)
+
+# 2. 파이프라인 함수 임포트
+from src.pipelines.generation_pipeline import generate_cs_response
+
+# 환경 변수 로드
 load_dotenv()
 
-def test_retriever(query_text: str, top_k: int = 3):
-    print(f"\n🔍 [사용자 질문]: '{query_text}'")
-    print("=" * 60)
+def run_test_scenarios():
+    """LangGraph 라우팅이 정상 작동하는지 확인하기 위한 시나리오 테스트"""
     
-    try:
-        # 2. Vector DB 인스턴스 가져오기
-        vector_store = get_vector_store()
-        
-        # 3. Retriever 설정 
-        retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": top_k})
-        
-        # 4. 문서 검색 실행
-        docs = retriever.invoke(query_text)
-        
-        # 5. 결과 출력
-        if not docs:
-            print("❌ 관련 문서를 찾을 수 없습니다.")
-            return
+    # 다양한 라우팅(분기)을 테스트할 수 있는 질문 세트
+    scenarios = [
+        {
+            "title": "테스트 1: 단순 인사말 (Router -> Chat Node)",
+            "query": "안녕! 오늘 날씨 참 좋다. 넌 이름이 뭐야?"
+        },
+        {
+            "title": "테스트 2: 일반 CS 문의 (Router -> Retrieve -> Generate)",
+            "query": "노트 어시스트 기능은 어떻게 사용하나요?"
+        },
+        {
+            "title": "테스트 3: 자가수리 대상 + 의향 없음 (Ask Intent Node)",
+            "query": "갤럭시 S22 액정이 깨졌어요. 수리비가 얼마인가요?"
+        },
+        {
+            "title": "테스트 4: 자가수리 대상 + 의향 있음 (Guide Node 병합)",
+            "query": "갤럭시 S22 후면 유리가 깨졌는데, 내가 직접 부품 사서 수리할래. 방법 알려줘."
+        },
+        {
+            "title": "테스트 5: 문서에 없는 엉뚱한 질문 (Fallback -> Nearest Center Node)",
+            "query": "사과폰 15 프로 전원이 갑자기 안 켜져요. 어떻게 고치죠?"
+        }
+    ]
 
-        for i, doc in enumerate(docs, 1):
-            metadata = doc.metadata
-            print(f"📄 [검색 결과 {i}]")
-            print(f"   - 📁 원본 파일 : {metadata.get('source_file', 'N/A')}")
-            print(f"   - 📑 카테고리   : {metadata.get('category', 'N/A')}")
-            print(f"   - 📌 문서 제목  : {metadata.get('title', 'N/A')}")
-            print(f"   - 👀 조회수     : {metadata.get('views', 0)}")
+    print("=" * 60)
+    print("🚀 [Agentic RAG 시나리오 테스트 시작]")
+    print("=" * 60)
+
+    for i, scenario in enumerate(scenarios, 1):
+        print(f"\n\n▶️ [{scenario['title']}]")
+        print(f"👤 사용자: {scenario['query']}")
+        print("-" * 60)
+        
+        # 파이프라인 실행
+        result = generate_cs_response(scenario['query'])
+        
+        # 결과 출력
+        print(f"🤖 AI 답변:\n{result['answer']}\n")
+        print(f"📑 출처: {result['source_document']}")
+        print(f"📊 신뢰도: {result['reliability_score']}")
+        
+        # 자가수리 판별 결과 (내부 State 확인용)
+        if result.get('device_model') or result.get('is_hardware_issue'):
+            print("\n[🔍 내부 State (자가수리 판별 결과)]")
+            print(f" - 추출된 기기명: {result.get('device_model')}")
+            print(f" - 하드웨어 파손 여부: {result.get('is_hardware_issue')}")
+            print(f" - 자가수리 의향(True/False/None): {result.get('wants_self_repair')}")
             
-            # 본문 내용이 길 수 있으므로 줄바꿈 처리하여 일부만 출력하거나 전체 출력
-            content = doc.page_content.replace('\n', ' ')
-            print(f"   - 📝 본문 내용  : {content[:600]}...") 
-            print("-" * 60)
-            
-    except Exception as e:
-        print(f"❌ 검색 중 오류 발생: {e}")
+    print("\n" + "=" * 60)
+    print("✅ [테스트 종료] 모든 시나리오 테스트가 완료되었습니다.")
+    print("=" * 60)
 
 if __name__ == "__main__":
-    # 테스트해보고 싶은 질문 리스트
-    test_queries = [
-        "화면 터치가 안 돼요.",
-        "알람 설정한 시간에 안 울려요.",
-        "노트 어시스트 기능 어떻게 써요?"
-    ]
+    # 시나리오 모드 실행
+    run_test_scenarios()
     
-    for q in test_queries:
-        test_retriever(q, top_k=2)
+    # 시나리오 종료 후, 직접 입력해볼 수 있는 대화형 프롬프트 제공
+    print("\n💡 직접 질문을 입력해보세요. (종료하려면 'q' 또는 'quit' 입력)")
+    while True:
+        user_input = input("\n👤 질문 입력: ")
+        if user_input.lower() in ['q', 'quit', 'exit']:
+            print("테스트를 종료합니다.")
+            break
+            
+        if not user_input.strip():
+            continue
+            
+        result = generate_cs_response(user_input)
+        print("-" * 60)
+        print(f"🤖 AI 답변:\n{result['answer']}")
+        print(f"\n[출처: {result['source_document']} | 신뢰도: {result['reliability_score']}]")
+        print("-" * 60)

@@ -4,6 +4,9 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from src.pipelines.embedding_pipeline import get_vector_store
 
+def ingest_selfrepair_data(file_path:str):
+    pass
+
 def ingest_faq_data(file_path: str):
     print(f"[{file_path}] 데이터 로드 시작...")
     
@@ -77,9 +80,17 @@ def ingest_faq_data(file_path: str):
     print(f"Vector DB(ChromaDB) 구축 완료! (적재된 원본 파일: {file_name})")
 
 if __name__ == "__main__":
-    target_file_path = "./data/raw/raw_data.xlsx"
+    target_faq_path = "./data/raw/raw_data.xlsx"
+    target_selfrepair_path = "./data/raw/raw_data.xlsx" #임시
     
-    if os.path.exists(target_file_path):
-        ingest_faq_data(target_file_path)
+    if os.path.exists(target_faq_path):
+        ingest_faq_data(target_faq_path)
     else:
-        print(f" 오류: '{target_file_path}' 파일 없음 .")
+        print(f" 오류: '{target_faq_path}' 파일 없음 .")
+
+'''#코드 미완성
+    if os.path.exists(target_selfrepair_path):
+        ingest_selfrepair_data(target_selfrepair_path)
+    else:
+        print(f" 오류: '{target_selfrepair_path}' 파일 없음 .")
+'''#코드 미완성

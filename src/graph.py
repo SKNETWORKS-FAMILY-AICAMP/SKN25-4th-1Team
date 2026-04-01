@@ -15,10 +15,12 @@ from src.nodes import (
     route_after_self_repair_check
 )
 
+
+
 def build_cs_rag_graph():
     """LangGraph 기반의 Agentic RAG 파이프라인을 구축합니다."""
     
-    # 1. 그래프 초기화 (GraphState 바구니를 들고 다닐 컨베이어 벨트 생성)
+    # 1. 그래프 초기화 
     workflow = StateGraph(GraphState)
     
     # ==========================================
