@@ -1,11 +1,13 @@
-from typing import TypedDict
+from typing import TypedDict, Optional
 
 class GraphState(TypedDict):
-    """
-    LangGraph의 상태를 정의합니다.
-    """
-    question: str               # 사용자 질문
-    context: str                # ChromaDB에서 검색된 문서 내용
-    answer: str                 # LLM이 생성한 답변
-    source_document: str        # 참조 문서 출처
-    reliability_score: float    # 답변 신뢰도 점수
+    question: str
+    context: str
+    answer: str
+    source_document: str
+    reliability_score: float
+    
+    # --- 자가수리 판별용 상태 추가 ---
+    device_model: Optional[str]      # 예: "Galaxy S22"
+    is_hardware_issue: bool          # 물리적 파손 여부 (True/False)
+    wants_self_repair: Optional[bool] # 자가수리 의향 (True/False/None)
