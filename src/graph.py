@@ -10,11 +10,21 @@ from src.nodes import (
     ask_intent_node,
     self_repair_guide_node,
     route_question,
-    grade_document_routing,
     check_hallucination_routing,
     route_after_self_repair_check
 )
 
+# 추가로 구현해야 할 라우팅 함수 (예시)
+def route_issue_type(state):
+    """retrieve_node 이후, 문서/의도를 바탕으로 SW, HW, 센터방문을 분류합니다."""
+    # 실제로는 state 내용을 보고 판단하는 로직이 들어갑니다.
+    issue_type = state.get("issue_type", "software") 
+    if issue_type == "hardware":
+        return "self_repair_classifier_node"
+    elif issue_type == "center":
+        return "nearest_center_node"
+    else:
+        return "generate_node"
 
 
 def build_cs_rag_graph():
@@ -35,56 +45,64 @@ def build_cs_rag_graph():
     workflow.add_node("self_repair_guide_node", self_repair_guide_node)
 
     # ==========================================
-    # 3. edge 연결
+    # 3. edge 연결 (비즈니스 로직 반영)
     # ==========================================
     
-    # [시작점 설정] 질문이 들어오면 가장 먼저 의도를 분류(Router)합니다.
+# [시작점] 질문 의도 분류 및 이전 맥락 이어가기
     workflow.set_conditional_entry_point(
         route_question,
         {
-            "chat_node": "chat_node",          # 잡담이면 chat_node로 이동
-            "retrieve_node": "retrieve_node"   # CS 문의면 검색 노드로 이동
-        }
+            # 일반 시작
+            "chat_node": "chat_node",          
+            "retrieve_node": "retrieve_node",
+            
+            # 사용자 선택 후 재진입 시 바로 직행하는 경로 추가
+            "nearest_center_node": "nearest_center_node",
+            "self_repair_guide_node": "self_repair_guide_node"
+            }
     )
 
-    # [검색 -> 평가 분기] 문서를 찾은 뒤, 이 문서가 쓸만한지 평가합니다.
+    # [검색 후 분기] SW문제인지, HW문제인지, 무조건 센터방문인지 판단
     workflow.add_conditional_edges(
         "retrieve_node",
-        grade_document_routing,
+        route_issue_type, # <-- 이 라우팅 함수에서 SW/HW/Center를 가릅니다.
         {
-            "generate_node": "generate_node",     
-            "nearest_center_node": "nearest_center_node"  # 웹 검색 대신 센터 안내로!
-        }
-    )
-    workflow.add_conditional_edges(
-        "generate_node",
-        check_hallucination_routing,
-        {
-            "self_repair_classifier_node": "self_repair_classifier_node", # 정상
-            "nearest_center_node": "nearest_center_node"                  # 환각 발견 시
+            "generate_node": "generate_node",                             # SW -> 답변 생성
+            "nearest_center_node": "nearest_center_node",                 # Center -> 센터 안내
+            "self_repair_classifier_node": "self_repair_classifier_node"  # HW -> 자가수리 모델 판별
         }
     )
 
-    # [자가수리 판별 -> 최종 분기] 고객의 자가수리 의향 및 대상 여부에 따라 흐름을 가릅니다.
+    # [자가수리 판별 후 분기] 자가수리 모델인가?
     workflow.add_conditional_edges(
         "self_repair_classifier_node",
         route_after_self_repair_check,
         {
-            "self_repair_guide_node": "self_repair_guide_node", # 의향 있음 -> 가이드 병합
-            "ask_intent_node": "ask_intent_node",               # 의향 모름 -> 역질문 추가
-            "END": END                                          # 대상 아님 -> 생성된 답변 그대로 반환 후 종료
+            "ask_intent_node": "ask_intent_node",         # 자가수리 모델 O -> "자가수리 할래? 센터 갈래?" 선택지 제공
+            "nearest_center_node": "nearest_center_node", # 자가수리 모델 X -> 묻지도 따지지도 않고 센터 안내
+        }
+    )
+
+    # [답변 생성 후 분기] 생성된 답변이 환각(거짓말)인지 순수하게 검증만 수행
+    workflow.add_conditional_edges(
+        "generate_node",
+        check_hallucination_routing,
+        {
+            "END": END,                                   # 환각 없음 -> 생성된 답변 반환하며 정상 종료
+            "nearest_center_node": "nearest_center_node"  # 환각 발생 시 -> 안전하게 센터 안내로 Fallback
         }
     )
 
     # ==========================================
-    # 4. 종료점(END) 연결
+    # 4. 일반 edge 및 종료점(END) 연결
     # ==========================================
     workflow.add_edge("chat_node", END)
+    # generate_node는 조건부 엣지로 END 처리가 되었으므로 제외
     workflow.add_edge("nearest_center_node", END)
     workflow.add_edge("ask_intent_node", END)
     workflow.add_edge("self_repair_guide_node", END)
 
-    # 5. 그래프 컴파일 (실행 가능한 앱 형태로 변환)
+    # 5. 그래프 컴파일
     app = workflow.compile()
     
     return app
