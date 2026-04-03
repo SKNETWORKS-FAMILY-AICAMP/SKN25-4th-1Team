@@ -1,11 +1,11 @@
 # ==========================================
-# 1. Environment Variables
+# 1. Environment Variables (보안 유지)
 # ==========================================
 .env
 *.local
 
 # ==========================================
-# 2. Python & Virtual Environment
+# 2. Python & Virtual Environment (기본 설정 유지)
 # ==========================================
 .venv/
 venv/
@@ -14,7 +14,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
 build/
 develop-eggs/
 dist/
@@ -28,19 +27,25 @@ sdist/
 var/
 wheels/
 
+# ==========================================
+# 3. Data & Vector Store (핵심 방어 구역)
+# ==========================================
+# RAG 데이터 및 DB 폴더 무시
+data/
+chroma_db/
+bm25_index/
+
+# 혹시 다른 경로에 생성될지 모르는 거대 파일 확장자 전역 차단
+*.pkl
+*.sqlite3
+*.csv
+*.xlsx
+*.parquet
 
 # ==========================================
-# 3. Data & Vector Store (ChromaDB)
+# 4. IDE & OS Files (개발 도구 및 시스템 파일)
 # ==========================================
-# 데이터베이스 물리 파일 및 원본/가공 데이터 무시
-# data/raw/*
-# data/processed/*
-# data/vector_store/*
-
-data/raw/.gitkeep
-data/processed/.gitkeep
-data/embeddings/.gitkeep
-data/vector_store/.gitkeep
-
 .vscode/
-
+.idea/
+.DS_Store
+Thumbs.db

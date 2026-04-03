@@ -12,5 +12,4 @@ def generate_cs_response(question: str, thread_id: str = "default_user"):
         
     except Exception as e:
         print(f"[Pipeline Error] 그래프 실행 중 오류 발생: {e}")
-        # 시스템 에러 발생 시에도 무너지지 않도록 안전한 기본값 반환
         return 0

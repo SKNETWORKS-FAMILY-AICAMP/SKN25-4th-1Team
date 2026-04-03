@@ -15,9 +15,6 @@ from src.pipelines.generation_pipeline import generate_cs_response
 load_dotenv()
 
 def run_test_scenarios():
-    """LangGraph 라우팅 및 멀티턴(Memory)이 정상 작동하는지 확인하기 위한 시나리오 테스트"""
-    
-    # thread_id를 부여하여 대화의 맥락이 이어지는지 테스트합니다.
     scenarios = [
         {
             "title": "테스트 1: 단순 인사말 (Router -> Chat Node)",
@@ -26,28 +23,13 @@ def run_test_scenarios():
         },
         {
             "title": "테스트 2: 일반 SW CS 문의 (Router -> Retrieve -> Generate)",
-            "query": "노트 어시스트 기능은 어떻게 사용하나요?",
-            "thread_id": "user_2"
-        },
-        {
-            "title": "테스트 3-1: 하드웨어 파손 + 자가수리 대상 (Ask Intent Node)",
-            "query": "갤럭시 S22 액정이 깨졌어요. 수리비가 얼마인가요?",
-            "thread_id": "user_3_multiturn" # 멀티턴 대화방 1번
-        },
-        {
-            "title": "테스트 3-2: 3-1에서 이어지는 대답 (Router -> Guide Node)",
-            "query": "내가 직접 부품 사서 수리해볼게. 방법 알려줘.",
-            "thread_id": "user_3_multiturn" # [핵심] 방금 전과 똑같은 thread_id를 사용!
-        },
-        {
-            "title": "테스트 5: 환각/엉뚱한 질문 (Generate -> Hallucination Fail -> Center)",
-            "query": "사과폰 15 프로 배터리 교체 비용 알려주세요.",
-            "thread_id": "user_5"
+            "query": "따뜻해지거나 뜨거워지는 등 발열 현상",
+            "thread_id": "user_6"
         }
     ]
 
     print("=" * 60)
-    print("🚀 [Agentic RAG 시나리오 테스트 시작 (멀티턴 지원)]")
+    print("chat node와 소프트웨어 질문 확인")
     print("=" * 60)
 
     for i, scenario in enumerate(scenarios, 1):
@@ -66,25 +48,19 @@ def run_test_scenarios():
         print(f"🤖 AI 답변:\n{answer}\n")
         print(f"📑 출처: {source} | 📊 신뢰도: {score}")
         
-        # 내부 State(Flag 및 추출 데이터) 확인용
-        print("\n[🔍 내부 State 모니터링]")
-        print(f" - 추출된 기기명: {result.get('device_model', '없음')}")
-        print(f" - 하드웨어 이슈 여부: {result.get('is_hardware_issue', False)}")
-        print(f" - ⏳ 사용자 선택 대기 상태(Flag): {result.get('waiting_for_repair_choice', False)}")
+  
             
     print("\n" + "=" * 60)
-    print("✅ [테스트 종료] 모든 시나리오 테스트가 완료되었습니다.")
+    print("[테스트 종료] ")
     print("=" * 60)
 
 if __name__ == "__main__":
     # 1. 정해진 시나리오 모드 실행
     run_test_scenarios()
     
-    # 2. 시나리오 종료 후, 직접 입력해볼 수 있는 대화형 챗봇 모드
-    print("\n💡 직접 질문을 입력해보세요. (멀티턴 대화가 유지됩니다. 종료하려면 'q' 입력)")
     
     # 사용자가 직접 테스트할 때는 동일한 세션 ID를 유지해야 대화가 이어집니다.
-    interactive_thread_id = "interactive_tester_001" 
+    interactive_thread_id = "userdemo" 
     
     while True:
         user_input = input("\n👤 사용자: ")
@@ -101,8 +77,5 @@ if __name__ == "__main__":
         print("-" * 60)
         print(f"🤖 AI 답변:\n{result.get('answer')}")
         
-        # 플래그 상태 살짝 표시
-        if result.get('waiting_for_repair_choice'):
-            print("\n  [⚙️ System: 사용자의 선택(자가수리/센터)을 기다리는 중입니다...]")
-            
+
         print("-" * 60)
