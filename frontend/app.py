@@ -2,7 +2,6 @@ import streamlit as st
 import uuid
 import time
 from api.client import get_chat_response
-from utils.db import insert_chat_log
 
 # 1. 페이지 설정 (세련된 테마 적용)
 st.set_page_config(
@@ -103,8 +102,6 @@ if prompt := st.chat_input("증상이나 궁금한 점을 입력해주세요 (�
         st.markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # 📝 사용자 질문 로그 DB 저장 (PostgreSQL)
-    insert_chat_log(st.session_state.thread_id, "user", prompt, selected_device)
 
     # AI 응답 생성 및 표시
     with st.chat_message("assistant"):
@@ -131,6 +128,3 @@ if prompt := st.chat_input("증상이나 궁금한 점을 입력해주세요 (�
             
     # AI 메시지 상태 저장
     st.session_state.messages.append({"role": "assistant", "content": response})
-    
-    # 📝 AI 답변 로그 DB 저장 (PostgreSQL)
-    insert_chat_log(st.session_state.thread_id, "assistant", response, selected_device)
