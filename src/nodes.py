@@ -6,28 +6,25 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from src.state import GraphState
 from src.pipelines.embedding_pipeline import get_vector_store
-import json # <-- 추가
+import json
 import pickle
 from langchain_community.retrievers import BM25Retriever
 import requests
 from dotenv import load_dotenv
 load_dotenv()
+
 KAKAO_API_KEY = os.getenv("KAKAO_API_KEY")
 
+def load_self_repair_json_str():
+    file_path = os.path.join("data", "processed", "self-repair-list.json")
+    with open(file_path, "r", encoding="utf-8") as f:
+        return f.read()
 
 def load_self_repair_models():
-    """self-repair-list.json 파일을 읽어서 모든 모델명을 1차원 리스트로 반환합니다."""
-    file_path = os.path.join("data", "processed", "self-repair-list.json")
-
+    file_path = os.path.join("data", "processed", "self-repair-list.txt")
 
     with open(file_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-        
-    all_models = []
-    for series, models in data.items():
-        all_models.extend(models)
-    return all_models # ['S20', 'S20 Plus', 'S20 Ultra', 'S21' ...]
-
+        return eval(f.read())
 
 
 # 공통으로 사용할 LLM (정확한 판단을 위해 temperature=0.0 유지)
@@ -142,10 +139,7 @@ def generate_node(state: GraphState) -> GraphState:
     response = llm.invoke([sys_msg] + state["messages"])
     return {"messages": [response], "source_document": "내부 매뉴얼", "reliability_score": 0.9}
 
-def load_self_repair_json_str():
-    file_path = os.path.join("data", "processed", "self-repair-list.json")
-    with open(file_path, "r", encoding="utf-8") as f:
-        return f.read()
+
 
 def self_repair_classifier_node(state: GraphState) -> GraphState:
     """하드웨어 문제 시, 기기 모델명, 하드웨어 여부, 그리고 사용자의 '자가수리 의향'을 동시에 추출합니다."""
@@ -248,8 +242,8 @@ def get_kakao_nearest_centers(lat: float, lng: float) -> str:
     
     params = {
         "query": "삼성전자 서비스센터",
-        "y": 37.498095, 
-        "x": 127.027610,
+        "y": 35.179554,   # 부산광역시청 위도
+        "x": 129.075641,  # 부산광역시청 경도
         "radius": 5000,
         "sort": "distance"
     }
@@ -284,8 +278,6 @@ def get_kakao_nearest_centers(lat: float, lng: float) -> str:
 def nearest_center_node(state: dict) -> dict: # LangGraph State 타입
     print("---NODE: 동적 센터 방문 안내 수행 (카카오 API)---")
     
-    # State에서 사용자의 위치 정보를 가져옵니다.
-    # (프론트엔드에서 브라우저 API로 받아온 좌표값을 state에 넣어주면 됩니다)
     user_lat = state.get("latitude", 37.4952) 
     user_lng = state.get("longitude", 127.0276)
     

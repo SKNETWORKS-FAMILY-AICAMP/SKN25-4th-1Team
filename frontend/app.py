@@ -1,7 +1,21 @@
 import streamlit as st
 import uuid
 import time
+import os
+import json
 from api.client import get_chat_response
+
+# JSON 데이터 로드
+def load_device_data():
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    json_path = os.path.join(base_dir, "data", "processed", "self-repair-list.json")
+    try:
+        with open(json_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+device_data = load_device_data()
 
 # 1. 페이지 설정 (세련된 테마 적용)
 st.set_page_config(
@@ -70,8 +84,15 @@ with st.sidebar:
     st.markdown("#### 📱 기기 선택")
     st.caption("더 정확하고 빠른 문제 해결을 위해 현재 사용 중이신 기기 모델을 선택해주세요.")
     
-    device_options = ["선택하지 않음", "갤럭시 S24 Ultra", "갤럭시 S24", "갤럭시 S23", "갤럭시 Z Fold 5", "갤럭시 Z Flip 5", "갤럭시 A 시리즈", "기타"]
-    selected_device = st.selectbox("현재 기기 (선택사항)", options=device_options, index=0, label_visibility="collapsed")
+    series_options = ["선택하지 않음"] + list(device_data.keys()) + ["기타"]
+    selected_series = st.selectbox("1차: 기기 시리즈", options=series_options, index=0)
+    
+    selected_device = "선택하지 않음"
+    if selected_series not in ["선택하지 않음", "기타"]:
+        model_options = device_data[selected_series]
+        selected_device = st.selectbox("2차: 상세 기기 모델", options=model_options)
+    elif selected_series == "기타":
+        selected_device = "기타"
     
     st.divider()
     
