@@ -3,17 +3,18 @@ from langgraph.checkpoint.memory import MemorySaver
 from src.state import GraphState
 
 from src.nodes import (
+    #노드 불러오기
     chat_node,
     retrieve_node,
     generate_node,
     nearest_center_node,
     self_repair_classifier_node,
     self_repair_guide_node,
+    fallback_node,
+    #라우팅
     route_question,
-    check_hallucination_routing,
     route_after_self_repair_check,
     route_issue_type,
-    fallback_node
 )
 
 
@@ -50,7 +51,6 @@ def build_cs_rag_graph():
         route_issue_type, 
         {
             "generate_node": "generate_node",
-            "nearest_center_node": "nearest_center_node",
             "self_repair_classifier_node": "self_repair_classifier_node",
             "fallback_node": "fallback_node"
         }
