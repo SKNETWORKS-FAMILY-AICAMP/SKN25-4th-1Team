@@ -20,8 +20,8 @@ COPY . .
 # 6. 실행 스크립트 권한 부여
 RUN chmod +x run_scripts.sh
 
-# 7. 포트 노출 (FastAPI: 8000, Streamlit: 8501)
-EXPOSE 8000 8501
+# 7. 포트 노출 (FastAPI: 8000, Streamlit: 8501, Redis: 6379)
+EXPOSE 8000 8501 6379
 
 # 8. 실행 명령
 CMD ["./run_scripts.sh"]

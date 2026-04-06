@@ -6,6 +6,14 @@ echo "Starting Agentic Mobile CS API, Streamlit UI, Redis, and Celery..."
 redis-server --daemonize yes
 sleep 2
 
+# Check Redis connection
+if redis-cli ping > /dev/null 2>&1; then
+    echo "[SUCCESS] Redis is up and running."
+else
+    echo "[ERROR] Redis failed to start or is not reachable."
+    exit 1
+fi
+
 # 환경 변수 설정
 export PYTHONPATH=$PYTHONPATH:.
 

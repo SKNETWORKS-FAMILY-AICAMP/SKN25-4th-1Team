@@ -8,15 +8,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Celery 및 Redis 설정 (Broker로 Redis 사용)
-CELERY_BROKER = f"redis://{os.getenv('REDIS_HOST', 'localhost')}:{os.getenv('REDIS_PORT', 6379)}/1"
+CELERY_BROKER = f"redis://{os.getenv('REDIS_HOST')}:{os.getenv('REDIS_PORT')}/0"
 celery_app = Celery("log_worker", broker=CELERY_BROKER)
 
 # MongoDB 및 Redis 클라이언트 초기화
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
 db = mongo_client["chatbot_db"]
 redis_client = Redis(
-    host=os.getenv("REDIS_HOST", "localhost"), 
-    port=int(os.getenv("REDIS_PORT", 6379)), 
+    host=os.getenv("REDIS_HOST"), 
+    port=int(os.getenv("REDIS_PORT")), 
     decode_responses=True
 )
 
@@ -54,4 +54,4 @@ def flush_streams_to_mongo():
                 db["node_perf_logs"].insert_many(docs)
             
             # 처리 완료된 메시지는 스트림에서 삭제
-            redis_client.xdel(stream_name, *msg_ids)
+            #redis_client.xdel(stream_name, *msg_ids)
