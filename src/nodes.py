@@ -1,4 +1,8 @@
 import os
+import json
+import pickle
+import time
+from functools import wraps
 from pydantic import BaseModel, Field
 from typing import Literal, Optional
 from langchain_openai import ChatOpenAI
@@ -7,14 +11,33 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from src.state import GraphState
 from src.pipelines.embedding_pipeline import get_vector_store
 from src.pipelines.self_repair_rag_pipeline import make_rag_chain, get_available_models
- 
-import json
-import pickle
+from src.utils.logger import save_node_perf
 from langchain_community.retrievers import BM25Retriever
 import requests
 from dotenv import load_dotenv
  
 load_dotenv()
+ 
+# ==========================================
+# [0] 시간 측정 데코레이터
+# ==========================================
+def time_node(func):
+    @wraps(func)
+    def wrapper(state: GraphState, *args, **kwargs):
+        start_time = time.time()
+        node_name = func.__name__
+        trace_id = state.get("trace_id", "unknown_trace")
+        
+        # 실제 노드 실행
+        result = func(state, *args, **kwargs)
+        
+        duration = time.time() - start_time
+        
+        # Redis Stream에 성능 로그 저장
+        save_node_perf(trace_id, node_name, duration)
+        
+        return result
+    return wrapper
  
 KAKAO_API_KEY = os.getenv("KAKAO_API_KEY")
  
@@ -65,6 +88,7 @@ class SelfRepairExtraction(BaseModel):
 # ==========================================
 # [2] 조건부 라우팅 함수
 # ==========================================
+@time_node
 def route_issue_type(state: GraphState) -> str:
     print("---ROUTING: 이슈 타입 분류 중---")
     
@@ -89,6 +113,7 @@ def route_issue_type(state: GraphState) -> str:
     return "generate_node"
  
     
+@time_node
 def route_after_self_repair_check(state: GraphState) -> str:
     print("---ROUTING: 자가수리 라우팅 체크---")
     
@@ -99,6 +124,7 @@ def route_after_self_repair_check(state: GraphState) -> str:
  
 
 
+@time_node
 def route_question(state: GraphState) -> str:
     print("---ROUTING: 진입점 및 의도 분류 중---")
     structured_llm = llm.with_structured_output(RouteQuery)
@@ -115,6 +141,7 @@ def route_question(state: GraphState) -> str:
 # ==========================================
 # [3] 노드들
 # ==========================================
+@time_node
 def chat_node(state: GraphState) -> GraphState:
     print("---NODE: 일반 대화---")
     
@@ -163,6 +190,7 @@ def chat_node(state: GraphState) -> GraphState:
     }
  
  
+@time_node
 def retrieve_node(state: GraphState) -> GraphState:
     print("---NODE: 문서 검색 (Vector DB 단독)---")
     question = state["messages"][-1].content
@@ -223,6 +251,7 @@ def retrieve_node(state: GraphState) -> GraphState:
  
     return {"context": context, "relevance_score": float(top_score)}
  
+@time_node
 def generate_node(state: GraphState) -> GraphState:
     print("---NODE: 1차 답변 생성---")
     
@@ -280,6 +309,7 @@ def generate_node(state: GraphState) -> GraphState:
         "show_resolution_buttons": True  
     }
  
+@time_node
 def self_repair_classifier_node(state: GraphState) -> GraphState:
     print("---NODE: 자가수리 분류기 (기기, 파손, 수리의향 동시 판별)---")
     
@@ -332,6 +362,7 @@ def self_repair_classifier_node(state: GraphState) -> GraphState:
     }
  
  
+@time_node
 def self_repair_guide_node(state: GraphState) -> GraphState:
     print("---NODE: 자가수리 매뉴얼 검색 및 안내---")
     device_model = state.get('device_model')
@@ -399,6 +430,7 @@ def get_kakao_nearest_centers(lat: float, lng: float) -> str:
         
     return None
  
+@time_node
 def nearest_center_node(state: dict) -> dict:
     print("---NODE: 동적 센터 방문 안내 수행 (카카오 API)---")
     
@@ -422,6 +454,7 @@ def nearest_center_node(state: dict) -> dict:
         "waiting_for_repair_choice": False
     }
  
+@time_node
 def fallback_node(state: GraphState) -> GraphState:
     print("---NODE: 검색 실패 예외 처리 (선택지 제공)---")
     
