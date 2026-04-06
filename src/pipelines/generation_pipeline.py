@@ -1,17 +1,32 @@
 import os
 import json
 from datetime import datetime
+from pymongo import MongoClient
+from dotenv import load_dotenv
 from src.graph import rag_app
 
-LOG_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data", "logs", "usage_log.jsonl")
+load_dotenv()
+
+### === log 적재 함수 추가
+MONGO_URI = os.getenv("MONGO_URI")
+
+try:
+    mongo_client = MongoClient(MONGO_URI)
+    db = mongo_client["chatbot_db"] # 사용할 데이터베이스명 지정
+    log_collection = db["usage_logs"] # 기록을 쌓을 로그 컬렉션명
+except Exception as e:
+    print(f"[MongoDB Error] MongoDB 연결 실패: {e}")
+    mongo_client = None
 
 def save_log(log_data: dict):
-    os.makedirs(os.path.dirname(LOG_FILE_PATH), exist_ok=True)
     try:
-        with open(LOG_FILE_PATH, "a", encoding="utf-8") as f:
-            f.write(json.dumps(log_data, ensure_ascii=False) + "\n")
+        if mongo_client:
+            log_collection.insert_one(log_data)
+        else:
+            print("[Log Error] MongoDB가 연결되지 않아 저장할 수 없습니다.")
     except Exception as e:
-        print(f"[Log Error] 로그 저장 실패: {e}")
+        print(f"[MongoDB Log Error] 로그 저장 실패: {e}")
+
 
 def generate_cs_response(question: str, selected_device: str = "선택하지 않음", thread_id: str = "default_user"): 
     

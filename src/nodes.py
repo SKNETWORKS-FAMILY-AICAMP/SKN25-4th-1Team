@@ -79,6 +79,54 @@ def route_question(state: GraphState) -> str:
     return "retrieve_node"
 
 
+def route_issue_type(state: GraphState) -> str:
+    print("---ROUTING: 이슈 타입 분류 중---")
+    
+    if state.get("context") == "검색된 문서 없음":
+        return "fallback_node"
+    
+    prompt = f"""사용자의 질문이 어떤 유형에 속하는지 분류하세요.
+[사전 선택 기기: {state.get("selected_device", "선택하지 않음")}]
+
+분류 지침:
+1. 'hardware' (하드웨어 문제 및 수리):
+- 디스플레이 액정 파손, 뒷판/후면 커버 파손 등 물리적 파손
+- "교체", "자가수리", "수리", "분해", "부품" 등의 단어가 포함되거나 스스로 고치기를 원하는 경우
+- 배터리 교체 문의 (배터리 소모가 아니라 '교체'나 물리적인 장착/탈착을 의미할 때)
+
+2. 'software' (소프트웨어 및 설정, 사용법 등):
+- 전원/배터리/충전 (단순 배터리 소모 심함, 충전 안됨, 발열 등)
+- 블루투스, 멈춤/오류/재시작, 시스템 설정, 데이터 이동
+- 네트워크/WI-FI, 카메라/갤러리 앱 오류, 디스플레이 화면 설정/다크모드
+- 애플리케이션 설치/오류, 전화/문자 수발신 문제, 센서/터치/소리/진동 설정
+- 업데이트, 사양/구성품/액세서리 문의, 동기화 기타 주의사항
+
+3. 'center_visit' (서비스센터 방문 응급):
+- 당장 서비스센터 위치를 묻거나 예약을 요구할 때
+"""
+    
+    sys_msg = SystemMessage(content=prompt)
+    structured_llm = llm.with_structured_output(IssueTypeCheck)
+    result = structured_llm.invoke([sys_msg] + state["messages"])
+    
+    if result.issue_type == "software":
+        return "generate_node"
+    elif result.issue_type == "hardware":
+        return "self_repair_classifier_node"
+    else: # center_visit
+        return "nearest_center_node"
+
+
+def route_after_self_repair_check(state: GraphState) -> str:
+    print("---ROUTING: 자가수리 라우팅 체크---")
+    
+    if state.get("waiting_for_repair_choice"):
+        return "self_repair_guide_node"
+    return "nearest_center_node"
+
+
+
+
 # ==========================================
 # [3] 실제 작업을 수행하는 노드들 (Nodes)
 # ==========================================
@@ -343,55 +391,3 @@ def fallback_node(state: GraphState) -> GraphState:
         "waiting_for_repair_choice": False
     }
 
-def route_issue_type(state: GraphState) -> str:
-    print("---ROUTING: 이슈 타입 분류 중---")
-    
-    if state.get("context") == "검색된 문서 없음":
-        return "fallback_node"
-    
-    prompt = f"""사용자의 질문이 어떤 유형에 속하는지 분류하세요.
-[사전 선택 기기: {state.get("selected_device", "선택하지 않음")}]
-
-분류 지침:
-1. 'hardware' (하드웨어 문제 및 수리):
-- 디스플레이 액정 파손, 뒷판/후면 커버 파손 등 물리적 파손
-- "교체", "자가수리", "수리", "분해", "부품" 등의 단어가 포함되거나 스스로 고치기를 원하는 경우
-- 배터리 교체 문의 (배터리 소모가 아니라 '교체'나 물리적인 장착/탈착을 의미할 때)
-
-2. 'software' (소프트웨어 및 설정, 사용법 등):
-- 전원/배터리/충전 (단순 배터리 소모 심함, 충전 안됨, 발열 등)
-- 블루투스, 멈춤/오류/재시작, 시스템 설정, 데이터 이동
-- 네트워크/WI-FI, 카메라/갤러리 앱 오류, 디스플레이 화면 설정/다크모드
-- 애플리케이션 설치/오류, 전화/문자 수발신 문제, 센서/터치/소리/진동 설정
-- 업데이트, 사양/구성품/액세서리 문의, 동기화 기타 주의사항
-
-3. 'center_visit' (서비스센터 방문 응급):
-- 당장 서비스센터 위치를 묻거나 예약을 요구할 때
-"""
-    
-    sys_msg = SystemMessage(content=prompt)
-    structured_llm = llm.with_structured_output(IssueTypeCheck)
-    result = structured_llm.invoke([sys_msg] + state["messages"])
-    
-    if result.issue_type == "software":
-        return "generate_node"
-    elif result.issue_type == "hardware":
-        return "self_repair_classifier_node"
-    else: # center_visit
-        return "nearest_center_node"
-
-def route_after_self_repair_check(state: GraphState) -> str:
-    print("---ROUTING: 자가수리 라우팅 체크---")
-    
-    if state.get("waiting_for_repair_choice"):
-        return "self_repair_guide_node"
-        
-    return "nearest_center_node"
-
-def check_hallucination_routing(state: GraphState) -> str:
-    print("---ROUTING: 환각 체크---")
-    score = state.get("reliability_score", 1.0)
-    if score >= 0.8:
-        return "END"
-    else:
-        return "nearest_center_node"
