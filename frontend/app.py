@@ -58,48 +58,95 @@ st.markdown("""
 .stApp, .stApp [data-testid="stChatMessageContent"] {
     font-family: 'Pretendard', sans-serif;
 }
-.stApp { background-color: #F8FAFC !important; }
-footer { display: none !important; }
 
+/* ✅ 1. 전체 메인 배경색 및 글자색 강제 고정 */
+html, body, [data-testid="stAppViewContainer"], .stApp { 
+    background-color: #F8FAFC !important; 
+    color: #0F172A !important;
+}
+h1, h2, h3, h4, h5, h6, p, label, span, div { color: #0F172A !important; }
+
+/* ✅ 2. 헤더 및 푸터 숨김, 상단 공백 제거 */
+header, footer, [data-testid="stToolbar"], [data-testid="stHeader"] { 
+    display: none !important; 
+    height: 0px !important;
+}
+[data-testid="stAppViewContainer"] > section:nth-child(2) > div:nth-child(1) {
+    padding-top: 0 !important;
+}
+
+/* ✅ 3. 사이드바 다크모드 차단 및 하얗게 고정 */
+[data-testid="stSidebar"],
+[data-testid="stSidebar"] > div:first-child {
+    background-color: #FFFFFF !important;
+    border-right: 1px solid #E2E8F0 !important;
+}
+[data-testid="stSidebar"] * {
+    color: #0F172A !important;
+}
+
+/* ✅ 4. 하단 채팅 입력창 다크모드 완벽 차단 */
+[data-testid="stBottom"],
+[data-testid="stBottom"] > div {
+    background-color: #F8FAFC !important; 
+}
+[data-testid="stChatInput"] {
+    background-color: transparent !important;
+}
+[data-testid="stChatInput"] > div {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 12px !important;
+}
+[data-testid="stChatInput"] textarea {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+}
+[data-testid="stChatInput"] textarea::placeholder {
+    color: #94A3B8 !important;
+}
+
+/* 메인 컨테이너 여백 조정 */
 .block-container {
     max-width: 950px !important;
-    padding-top: 2rem !important;
+    padding-top: 1rem !important;
+    margin-top: -30px !important;
     padding-bottom: 10rem !important;
     margin: 0 auto !important;
 }
 
 .main-card {
-    background: #ffffff;
-    border-radius: 20px;
-    border: 1px solid #E2E8F0;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-    overflow: hidden;
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03) !important;
+    overflow: hidden !important;
 }
 
 .hero {
     padding: 3rem 2rem;
     text-align: center;
-    background: #ffffff;
-    border-bottom: 1px solid #F1F5F9;
+    background: #ffffff !important;
+    border-bottom: 1px solid #F1F5F9 !important;
 }
 .hero-h1 {
     font-size: 2.2rem;
     font-weight: 800;
-    color: #0F172A;
+    color: #0F172A !important;
     line-height: 1.3;
     margin-bottom: 0.8rem;
 }
-.hero-sub { font-size: 1rem; color: #64748B; }
+.hero-sub { font-size: 1rem; color: #64748B !important; }
 
 .device-chip {
     display: inline-block;
-    background: #EFF6FF;
-    color: #2563EB;
+    background: #EFF6FF !important;
+    color: #2563EB !important;
     padding: 3px 12px;
     border-radius: 50px;
     font-size: 0.8rem;
     font-weight: 700;
-    border: 1px solid #DBEAFE;
+    border: 1px solid #DBEAFE !important;
     margin-top: 10px;
 }
 
@@ -141,7 +188,6 @@ div[data-popq] .stButton > button:hover {
     box-shadow: 0 6px 12px rgba(0,0,0,0.05) !important;
 }
 
-
 /* 인기 질문 버튼 텍스트 말줄임 처리 (Image 1 스타일) */
 div[data-popq] .stButton > button > div > p {
     white-space: nowrap !important;
@@ -155,6 +201,18 @@ div[data-popq] .stButton > button > div > p {
 [data-testid="stChatMessageContent"] {
     background-color: #F1F5F9 !important;
     border-radius: 15px !important;
+    color: #0F172A !important;
+}
+
+/* ✅ 일반 입력창 및 셀렉트박스 다크모드 방지 */
+div[data-baseweb="input"] > div,
+div[data-baseweb="select"] > div {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+}
+div[data-baseweb="input"] input,
+div[data-baseweb="select"] div {
+    color: #0F172A !important;
 }
 
 /* 모든 버튼 전역 스타일 (세련된 파란색) */
@@ -209,7 +267,7 @@ def ask_ai(question):
 # 4. 사이드바
 # =========================================================
 with st.sidebar:
-    st.markdown("<h2 style='color:#2563EB; font-weight:800;'>Smart CS</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color:#2563EB !important; font-weight:800;'>Smart CS</h2>", unsafe_allow_html=True)
     st.divider()
     
     if st.button(" AI 채팅 상담", use_container_width=True, type="primary" if st.session_state.view == "chat" else "secondary"):
@@ -217,7 +275,7 @@ with st.sidebar:
     if st.button(" 자주 묻는 질문", use_container_width=True, type="primary" if st.session_state.view == "faq" else "secondary"):
         st.session_state.view = "faq"; st.rerun()
     
-    st.markdown("<br><p style='font-size:0.8rem; font-weight:700; color:#64748B;'>기기 모델 설정</p>", unsafe_allow_html=True)
+    st.markdown("<br><p style='font-size:0.8rem; font-weight:700; color:#64748B !important;'>기기 모델 설정</p>", unsafe_allow_html=True)
     series_options = ["선택하지 않음"] + list(device_data.keys()) + ["기타"]
     selected_series = st.selectbox("시리즈 선택", options=series_options, index=0, label_visibility="collapsed")
     
@@ -250,7 +308,7 @@ st.markdown(f"""
 st.markdown("<div style='padding: 2rem;'>", unsafe_allow_html=True)
 
 # =========================================================
-# 6. 인기 질문 섹션 (2행 3열 카드) - 추가됨
+# 6. 인기 질문 섹션 (2행 3열 카드)
 # =========================================================
 if not faq_df.empty:
     st.markdown("<div class='popular-title'>인기 질문</div>", unsafe_allow_html=True)
@@ -269,7 +327,7 @@ if not faq_df.empty:
 st.divider()
 
 # =========================================================
-# 7. 상담 및 FAQ 뷰 처리 (cleaned_content 답변 연동)
+# 7. 상담 및 FAQ 뷰 처리
 # =========================================================
 if st.session_state.view == "chat":
     st.markdown("<h3 style='margin-bottom:1.5rem;'>AI 상담 서비스</h3>", unsafe_allow_html=True)
@@ -334,14 +392,14 @@ else: # FAQ 뷰
 
     st.markdown(f"<p style='color:#94A3B8; font-size:0.85rem; margin-top:1rem;'>총 {len(df)}건의 검색 결과</p>", unsafe_allow_html=True)
 
-    # FAQ 리스트 출력 (중요: cleaned_content 연동 부분)
+    # FAQ 리스트 출력
     for idx, row in df.head(15).iterrows():
         c_main, c_btn = st.columns([5, 1])
         with c_main:
             st.markdown(f"""
             <div class='faq-row'>
-                <div class='faq-title-link'>{row['title']}</div>
-                <div class='faq-meta'>👁️ 조회수 {row['viewCnt']:,}</div>
+                <div class='faq-title-link' style='color:#0F172A !important; font-weight:600;'>{row['title']}</div>
+                <div class='faq-meta' style='color:#64748B !important; font-size:0.85rem;'>👁️ 조회수 {row['viewCnt']:,}</div>
             </div>""", unsafe_allow_html=True)
         with c_btn:
             st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
