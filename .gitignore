@@ -41,6 +41,8 @@ bm25_index/
 *.csv
 *.xlsx
 *.parquet
+.django_sessions/
+staticfiles/
 
 # ==========================================
 # 4. IDE & OS Files (개발 도구 및 시스템 파일)

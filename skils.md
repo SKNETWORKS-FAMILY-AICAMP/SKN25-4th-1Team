@@ -1,0 +1,4 @@
+- Langgraph로 설계된 답변 생성 함수는 절대 건드리지않는다.
+- frontend 폴더에 있던 프론트엔드가 하던 기능을 django와 html, css, javascript로 구성하도록 한다.
+- 웹페이지 개발을 위한 요구사항 정리 및 화면 설계
+- HTML, CSS, Javascript 기반 프론트와 Django 기반 백엔드 개발 통한 Web Application 구축

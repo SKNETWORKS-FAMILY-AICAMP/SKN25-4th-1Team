@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      FASTAPI_URL: http://127.0.0.1:8000/api/chat
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      MONGO_URI: mongodb://mongo:27017/
+      DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost
+    depends_on:
+      - mongo
+    ports:
+      - "8000:8000"
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+volumes:
+  mongo_data:

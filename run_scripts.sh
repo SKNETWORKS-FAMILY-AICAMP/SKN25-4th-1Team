@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Starting Agentic Mobile CS API, Streamlit UI, Redis, and Celery..."
+echo "Starting Agentic Mobile CS API, Django UI, Redis, and Celery..."
 
 # 0. Start Redis
 redis-server --daemonize yes
@@ -20,8 +20,8 @@ export PYTHONPATH=$PYTHONPATH:.
 # 1. Start FastAPI Backend
 python3 -m uvicorn entrypoint.main:app --host 0.0.0.0 --port 8000 &
 
-# 2. Start Streamlit UI
-python3 -m streamlit run frontend/app.py --server.port 8501 --server.address 0.0.0.0 --server.headless true &
+# 2. Start Django UI
+python3 manage.py runserver 0.0.0.0:8501 &
 
 # 3. Start Celery Worker & Beat
 python3 -m celery -A src.utils.tasks worker --beat --loglevel=info &
