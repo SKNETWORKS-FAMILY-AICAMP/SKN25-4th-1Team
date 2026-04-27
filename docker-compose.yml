@@ -1,29 +1,49 @@
 services:
-  app:
+  web:
     build:
       context: .
       dockerfile: Dockerfile
+    command: python frontend/manage.py runserver 0.0.0.0:8000
     env_file:
       - .env
     environment:
-      FASTAPI_URL: http://127.0.0.1:8000/api/chat
-      REDIS_HOST: localhost
+      REDIS_HOST: redis
       REDIS_PORT: 6379
       MONGO_URI: mongodb://mongo:27017/
-      DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost
+      DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost,0.0.0.0
     depends_on:
+      - redis
       - mongo
     ports:
       - "8000:8000"
-      - "8501:8501"
     volumes:
       - ./data:/app/data
     restart: unless-stopped
 
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m celery -A src.utils.tasks worker --beat --loglevel=info
+    env_file:
+      - .env
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MONGO_URI: mongodb://mongo:27017/
+    depends_on:
+      - redis
+      - mongo
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+
   mongo:
     image: mongo:7
-    ports:
-      - "27017:27017"
     volumes:
       - mongo_data:/data/db
     restart: unless-stopped
