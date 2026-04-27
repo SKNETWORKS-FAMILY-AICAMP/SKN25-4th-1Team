@@ -1,153 +1,42 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Smart CS</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
-    <link rel="stylesheet" href="{% static 'webui/styles.css' %}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SKN25 고객 지원 챗봇</title>
+  <link rel="stylesheet" href="{% static 'webui/styles.css' %}">
 </head>
-<body
-    data-initial-view="{{ current_view }}"
-    data-chat-url="{% url 'webui:chat-api' %}"
-    data-device-url="{% url 'webui:update-device' %}"
-    data-reset-url="{% url 'webui:reset-chat' %}"
->
-    {{ device_data|json_script:"device-data" }}
-    <div class="page-shell">
-        <aside class="sidebar">
-            <div class="brand-block">
-                <p class="eyebrow">Samsung Care Assistant</p>
-                <h1>Smart CS</h1>
-                <p class="brand-copy">LangGraph 백엔드는 그대로 두고, 상담 UI만 Django로 옮긴 스마트 고객센터입니다.</p>
-            </div>
+<body>
+  <main class="shell">
+    <section class="chat-panel" aria-label="고객 지원 챗봇">
+      <header class="chat-header">
+        <div>
+          <p class="eyebrow">Samsung Galaxy Service</p>
+          <h1>고객 지원 챗봇</h1>
+        </div>
+        <select id="deviceSelect" class="device-select" aria-label="기기 선택">
+          <option value="선택하지 않음">기기 선택 안 함</option>
+          <option value="Galaxy S24">Galaxy S24</option>
+          <option value="Galaxy S23">Galaxy S23</option>
+          <option value="Galaxy S22">Galaxy S22</option>
+          <option value="Galaxy Z Fold">Galaxy Z Fold</option>
+          <option value="Galaxy Z Flip">Galaxy Z Flip</option>
+        </select>
+      </header>
 
-            <div class="nav-group">
-                <button class="nav-pill" type="button" data-view-target="chat">AI 채팅 상담</button>
-                <button class="nav-pill" type="button" data-view-target="faq">자주 묻는 질문</button>
-            </div>
+      <div id="chatLog" class="chat-log" aria-live="polite">
+        <article class="message bot">
+          <p>안녕하세요. 갤럭시 기기 문제나 서비스센터 안내가 필요하시면 편하게 말씀해 주세요.</p>
+        </article>
+      </div>
 
-            <form id="device-form" class="device-form">
-                {% csrf_token %}
-                <div class="section-label">기기 모델 설정</div>
-                <label class="sr-only" for="series-select">시리즈 선택</label>
-                <select id="series-select" name="series">
-                    {% for series in series_options %}
-                        <option value="{{ series }}" {% if series == selected_series %}selected{% endif %}>{{ series }}</option>
-                    {% endfor %}
-                </select>
-
-                <label class="sr-only" for="device-select">상세 모델 선택</label>
-                <select id="device-select" name="device" data-selected-device="{{ selected_device }}"></select>
-
-                <button type="submit" class="secondary-button">기기 적용</button>
-            </form>
-
-            <button id="reset-chat-button" type="button" class="ghost-button">대화 초기화</button>
-        </aside>
-
-        <main class="content-shell">
-            <section class="hero-card">
-                <p class="eyebrow">Smart Support Hub</p>
-                <h2>궁금한 점을 남기면 빠르게 정리해드릴게요</h2>
-                <p class="hero-copy">기기 모델을 함께 선택하면 더 정확한 상담 흐름으로 이어집니다.</p>
-                <div class="device-badge" id="selected-device-badge">기기: {{ selected_device }}</div>
-            </section>
-
-            {% if popular_questions %}
-                <section class="popular-card">
-                    <div class="section-heading">
-                        <h3>인기 질문</h3>
-                        <p>자주 묻는 항목은 한 번에 바로 상담으로 넘길 수 있습니다.</p>
-                    </div>
-                    <div class="popular-grid">
-                        {% for question in popular_questions %}
-                            <button type="button" class="popular-question-button" data-question="{{ question }}">{{ question }}</button>
-                        {% endfor %}
-                    </div>
-                </section>
-            {% endif %}
-
-            <section id="chat-view" class="view-panel">
-                <div class="section-heading">
-                    <h3>AI 상담 서비스</h3>
-                    <p>백엔드 답변 생성 로직은 유지하고, UI만 Django 세션 기반으로 옮겼습니다.</p>
-                </div>
-
-                <div id="chat-messages" class="chat-stack">
-                    {% for message in messages %}
-                        <article class="chat-bubble chat-bubble--{{ message.role }}">
-                            <span class="chat-role">{% if message.role == 'assistant' %}AI{% else %}사용자{% endif %}</span>
-                            <div class="chat-content">{{ message.content|linebreaksbr }}</div>
-                        </article>
-                    {% endfor %}
-                </div>
-
-                <form id="chat-form" class="chat-form">
-                    {% csrf_token %}
-                    <label class="sr-only" for="chat-question">질문 입력</label>
-                    <textarea id="chat-question" name="question" rows="3" placeholder="증상이나 궁금한 점을 입력하세요"></textarea>
-                    <div class="chat-form-row">
-                        <p class="helper-copy">현재 스레드: {{ thread_id }}</p>
-                        <button type="submit" class="primary-button">질문 보내기</button>
-                    </div>
-                </form>
-            </section>
-
-            <section id="faq-view" class="view-panel">
-                <div class="section-heading">
-                    <h3>자주 묻는 질문</h3>
-                    <p>카테고리와 검색어로 FAQ를 고른 뒤 바로 AI 상담으로 넘길 수 있습니다.</p>
-                </div>
-
-                <form id="faq-filter-form" class="faq-filter-form" method="get">
-                    <input type="hidden" name="view" value="faq">
-                    <div class="category-grid">
-                        {% for category in categories %}
-                            <button
-                                type="submit"
-                                name="category"
-                                value="{{ category }}"
-                                class="category-chip {% if category == selected_category %}is-active{% endif %}"
-                            >
-                                {{ category }}
-                            </button>
-                        {% endfor %}
-                    </div>
-
-                    <div class="faq-controls">
-                        <input type="text" name="q" value="{{ faq_query }}" placeholder="검색어를 입력하세요...">
-                        <select name="sort">
-                            <option value="latest" {% if faq_sort == 'latest' %}selected{% endif %}>최신순</option>
-                            <option value="views" {% if faq_sort == 'views' %}selected{% endif %}>조회순</option>
-                            <option value="title" {% if faq_sort == 'title' %}selected{% endif %}>제목순</option>
-                        </select>
-                        <button type="submit" class="secondary-button">검색</button>
-                    </div>
-                </form>
-
-                <p class="result-copy">총 {{ total_faq_results }}건의 검색 결과</p>
-
-                <div class="faq-list">
-                    {% for faq in faq_rows %}
-                        <article class="faq-row">
-                            <div class="faq-main">
-                                <span class="faq-category">{{ faq.category }}</span>
-                                <h4>{{ faq.title }}</h4>
-                                <p>{{ faq.content_preview }}</p>
-                                <div class="faq-meta">조회수 {{ faq.view_count }}</div>
-                            </div>
-                            <button type="button" class="primary-button ask-ai-button" data-question="{{ faq.title }}">AI 상담</button>
-                        </article>
-                    {% empty %}
-                        <div class="empty-state">조건에 맞는 FAQ가 없습니다. 검색어나 카테고리를 조금 바꿔보세요.</div>
-                    {% endfor %}
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <script src="{% static 'webui/app.js' %}"></script>
+      <form id="chatForm" class="chat-form">
+        <textarea id="messageInput" name="message" rows="2" placeholder="예: 화면 터치가 잘 안 돼요" required></textarea>
+        <button id="sendButton" type="submit">전송</button>
+      </form>
+    </section>
+  </main>
+  <script src="{% static 'webui/app.js' %}"></script>
 </body>
 </html>
