@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>Smart CS | {{ screen_title }}</title>
     <link rel="stylesheet" href="{% static 'smartcs/css/app.css' %}">
 </head>
@@ -11,11 +12,9 @@
     <div class="site-shell">
         <header class="topbar">
             <div class="topbar-inner">
-
-                <!-- 로고 + 언어 -->
                 <div class="brand-group">
-                    <a class="brand" href="{% url 'home' %}">
-                        <img class="brand-logo" src="{% static 'smartcs/images/smart-cs-logo.svg' %}" alt="Smart CS 로고">
+                    <a class="brand" href="{% url 'home' %}" data-home-reset-link>
+                        <img class="brand-logo" src="{% static 'smartcs/images/smart-cs-logo.svg' %}" alt="Smart CS logo">
                     </a>
                     <div class="lang-toggle">
                         <button type="button" class="search-tool-button" data-language-toggle="ko">한국어</button>
@@ -23,30 +22,18 @@
                     </div>
                 </div>
 
-                
                 <nav class="topnav">
-                    <a href="{% url 'faq_browser' %}" 
-                       class="{% if request.path == '/faq/' %}active{% endif %}" 
-                       data-i18n="nav.faq">FAQ</a>
-
-                    <a href="{% url 'service_centers' %}" 
-                       class="{% if request.path == '/service-centers/' %}active{% endif %}" 
-                       data-i18n="nav.service-centers">Service Centers</a>
+                    <a href="{% url 'faq_browser' %}" class="{% if request.path == '/faq/' %}active{% endif %}" data-i18n="nav.faq">FAQ</a>
+                    <a href="{% url 'service_centers' %}" class="{% if request.path == '/service-centers/' %}active{% endif %}" data-i18n="nav.service-centers">Service Centers</a>
 
                     {% if request.user.is_authenticated %}
                         <span>{{ request.user.username }}님</span>
                         <a href="{% url 'accounts:logout' %}">Logout</a>
                     {% else %}
-                        <a href="{% url 'accounts:login' %}" 
-                           class="{% if request.path == '/accounts/login/' %}active{% endif %}" 
-                           data-i18n="nav.login">Login</a>
-
-                        <a href="{% url 'accounts:signup' %}" 
-                           class="{% if request.path == '/accounts/signup/' %}active{% endif %}" 
-                           data-i18n="nav.signup">Sign Up</a>
+                        <a href="{% url 'accounts:login' %}" class="{% if request.path == '/accounts/login/' %}active{% endif %}" data-i18n="nav.login">Login</a>
+                        <a href="{% url 'accounts:signup' %}" class="{% if request.path == '/accounts/signup/' %}active{% endif %}" data-i18n="nav.signup">Sign Up</a>
                     {% endif %}
                 </nav>
-
             </div>
         </header>
 

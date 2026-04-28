@@ -12,33 +12,24 @@ DEVICE_PATH = DATA_DIR / "self-repair-list.json"
 FAQ_CATEGORIES = [
     "전원/배터리/충전",
     "블루투스",
-    "멈춤/오류/꺼짐",
-    "설정",
-    "데이터",
+    "멈춤/오류/재시작",
+    "시스템 설정",
+    "데이터이동",
     "네트워크/WI-FI",
     "카메라/갤러리",
     "디스플레이",
     "애플리케이션",
     "전화/문자",
-    "센서/연결",
+    "센서/터치",
     "소리/진동",
     "업데이트",
     "사양/구성품",
     "액세서리",
-    "이동통신서비스",
+    "이동통신사서비스",
     "기타/주의사항",
 ]
 
-FAQ_TOPICS = ["배터리", "충전", "네트워크", "디스플레이", "카메라", "업데이트"]
-
-POPULAR_FALLBACK_QUESTIONS = [
-    "배터리가 빨리 닳아요",
-    "충전이 되지 않아요",
-    "와이파이가 자주 끊겨요",
-    "화면이 멈추고 꺼져요",
-    "카메라 초점이 맞지 않아요",
-    "서비스센터를 찾고 싶어요",
-]
+FAQ_TOPICS = ["배터리", "충전", "네트워크", "디스플레이", "카메라"]
 
 FAQ_FALLBACK_ITEMS = [
     {
@@ -46,9 +37,9 @@ FAQ_FALLBACK_ITEMS = [
         "topic": "배터리",
         "tag": "배터리",
         "content": (
-            "배터리 사용 시간이 급격히 줄어든 경우 화면 밝기, 백그라운드 앱, "
-            "고주사율 설정, 위치 서비스, 네트워크 사용량을 먼저 확인해 주세요. "
-            "배터리 보호 설정과 절전 모드를 적용한 뒤에도 개선되지 않으면 진단 또는 서비스센터 점검이 필요할 수 있습니다."
+            "배터리 사용 시간이 급격히 줄어든 경우 화면 밝기, 백그라운드 앱, 고주사율 설정, "
+            "위치 서비스, 네트워크 사용량을 먼저 확인해 주세요. 배터리 보호 설정과 절전 모드를 "
+            "적용한 뒤에도 개선되지 않으면 진단 또는 서비스센터 점검이 필요할 수 있습니다."
         ),
     },
     {
@@ -64,18 +55,33 @@ FAQ_FALLBACK_ITEMS = [
         "content": "공유기 재부팅, 저장된 네트워크 삭제 후 재연결, 네트워크 설정 초기화를 차례로 시도해볼 수 있습니다.",
     },
     {
-        "title": "화면이 멈추거나 터치가 잘 안 될 때는 어떻게 해야 하나요?",
+        "title": "화면이 멈추거나 터치가 안 될 때는 어떻게 해야 하나요?",
         "topic": "디스플레이",
         "tag": "화면",
         "content": "강제 재시작, 안전 모드 점검, 보호필름 상태 확인 후에도 지속되면 하드웨어 점검이 필요할 수 있습니다.",
     },
     {
-        "title": "카메라 초점이 잘 맞지 않을 때 점검할 부분은 무엇인가요?",
+        "title": "카메라 초점이 맞지 않을 때 확인할 부분은 무엇인가요?",
         "topic": "카메라",
         "tag": "카메라",
-        "content": "렌즈 오염 여부를 닦아낸 뒤 카메라 앱 설정 초기화와 다른 촬영 모드 테스트를 진행해 주세요.",
+        "content": "렌즈 오염 여부를 먼저 확인하고 카메라 앱 설정 초기화와 다른 촬영 모드 테스트를 진행해 주세요.",
+    },
+    {
+        "title": "업데이트 후 이상이 생기면 어떻게 해야 하나요?",
+        "topic": "업데이트",
+        "tag": "업데이트",
+        "content": "앱 최신화, 캐시 정리, 재부팅을 먼저 시도하고 동일 증상이 계속되면 오류 리포트와 점검이 필요할 수 있습니다.",
     },
 ]
+
+TOPIC_QUERY_HINTS = {
+    "배터리": ["배터리", "battery"],
+    "충전": ["충전", "charge", "charging"],
+    "네트워크": ["네트워크", "와이파이", "wifi", "wi-fi", "network"],
+    "디스플레이": ["디스플레이", "화면", "display", "screen"],
+    "카메라": ["카메라", "camera"],
+    "업데이트": ["업데이트", "update", "software"],
+}
 
 
 def topic_to_icon_key(topic):
@@ -162,29 +168,77 @@ def load_popular_question_items(limit=6):
     return items
 
 
+def _build_detail_from_row(row):
+    topic = row.get("symptom_category") or "FAQ"
+    return {
+        "title": row["title"],
+        "topic": topic,
+        "tag": topic,
+        "topic_key": topic_to_icon_key(topic),
+        "content": row.get("cleaned_content") or "상세 안내 내용을 준비 중입니다.",
+    }
+
+
+def _find_topic_detail(question, faq_df):
+    hints = TOPIC_QUERY_HINTS.get(question, [question])
+
+    for item in FAQ_FALLBACK_ITEMS:
+        if any(hint.lower() == str(item.get("topic", "")).lower() for hint in hints):
+            return {**item, "topic_key": topic_to_icon_key(item.get("topic") or item.get("tag"))}
+
+    if not faq_df.empty:
+        for hint in hints:
+            title_matches = faq_df[faq_df["title"].str.contains(hint, case=False, na=False)]
+            if not title_matches.empty:
+                row = title_matches.sort_values("viewCnt", ascending=False).iloc[0]
+                return _build_detail_from_row(row)
+
+            content_matches = faq_df[faq_df["cleaned_content"].str.contains(hint, case=False, na=False)]
+            if not content_matches.empty:
+                row = content_matches.sort_values("viewCnt", ascending=False).iloc[0]
+                return _build_detail_from_row(row)
+
+            category_matches = faq_df[faq_df["symptom_category"].str.contains(hint, case=False, na=False)]
+            if not category_matches.empty:
+                row = category_matches.sort_values("viewCnt", ascending=False).iloc[0]
+                return _build_detail_from_row(row)
+
+    for item in FAQ_FALLBACK_ITEMS:
+        item_text = " ".join([item.get("title", ""), item.get("topic", ""), item.get("tag", ""), item.get("content", "")])
+        if any(hint.lower() in item_text.lower() for hint in hints):
+            return {**item, "topic_key": topic_to_icon_key(item.get("topic") or item.get("tag"))}
+
+    return None
+
+
 def find_question_detail(question):
     if not question:
         items = load_popular_question_items(limit=1)
         return items[0] if items else FAQ_FALLBACK_ITEMS[0]
 
     faq_df = load_faq_data()
+
+    if question in FAQ_TOPICS:
+        topic_detail = _find_topic_detail(question, faq_df)
+        if topic_detail:
+            return topic_detail
+
     if not faq_df.empty:
         exact = faq_df[faq_df["title"] == question]
         if exact.empty:
             exact = faq_df[faq_df["title"].str.contains(question, case=False, na=False)]
         if not exact.empty:
             row = exact.iloc[0]
-            return {
-                "title": row["title"],
-                "topic": row.get("symptom_category") or "FAQ",
-                "tag": row.get("symptom_category") or "FAQ",
-                "topic_key": topic_to_icon_key(row.get("symptom_category") or "FAQ"),
-                "content": row.get("cleaned_content") or "상세 안내 내용을 준비 중입니다.",
-            }
+            return _build_detail_from_row(row)
 
     for item in FAQ_FALLBACK_ITEMS:
         if question in item["title"] or item["title"] in question:
             return {**item, "topic_key": topic_to_icon_key(item.get("topic") or item.get("tag"))}
+
+    topic_detail = _find_topic_detail(question, faq_df)
+    if topic_detail:
+        return topic_detail
+
     fallback = FAQ_FALLBACK_ITEMS[0]
     return {**fallback, "topic_key": topic_to_icon_key(fallback.get("topic") or fallback.get("tag"))}
 
