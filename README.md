@@ -1,492 +1,657 @@
-# 🤖 [프로젝트 제목] LangGraph 기반 모바일 CS 챗봇 
+# 🤖 Smart CS — LangGraph 기반 모바일 CS 웹 서비스
+
+<div align="center">
+
+**삼성 갤럭시 사용자를 위한 AI 고객센터 웹 서비스**
+
+</div>
 
 팀명 : **알려조**
 
-## 👥 팀원
+---
+
+## 👥 팀원 소개
 
 | 이름 | 역할 |
 | --- | --- |
-| 김나연 | Backend(DB, Docker 등 구현) / Langgraph 구조 설계/ 코드 통합 |
-| 김지현 | 성능 평가를 위한 지표 설계 및 파이프라인 구축, 발표 |
-| 박범수 | 자가수리 RAG 파이프라인 구축, Frontend 구현 |
-| 이하윤 | 자가수리 RAG 파이프라인 구축, Frontend 구현 |
-| 여해준 | FAQ 크롤링 및 전처리/ LangGraph 노드 개선 및 RAG 파이프라인 최적화/ README 작성 |
+| 김나연 |  |
+| 김지현 |  |
+| 박범수 |  |
+| 이하윤 |  |
+| 여해준 |  |
 
 ---
 
-## 프로젝트 소개 및 목표
+🏆 [SKN Family AI캠프] 4차 단위 프로젝트  
+📅 개발 기간: 2026.04.25 ~ 2026.04.29
 
-### 프로젝트 소개
+---
 
-**서비스 명:** Smart CS (스마트 고객센터)
+## 📑 목차
+1. [프로젝트 개요](#-프로젝트-개요)
+2. [문제 정의 및 목표](#-문제-정의-및-목표)
+3. [주요 기능](#-주요-기능)
+4. [기술 스택](#-기술-스택)
+5. [시스템 아키텍처](#-시스템-아키텍처)
+6. [프로젝트 디렉토리 구조](#-프로젝트-디렉토리-구조)
+7. [핵심 구현 내용](#-핵심-구현-내용)
+8. [차별화 포인트](#-차별화-포인트)
+9. [API 명세](#-api-명세)
+10. [환경 구축 및 실행 방법](#-환경-구축-및-실행-방법)
+11. [한 줄 회고](#-한-줄-회고)
 
-**기존 CS 시스템의 한계**
+---
 
-기존 FAQ 시스템은 정해진 키워드에만 반응하여 사용자의 다양한 구어체 표현이나 복잡한 맥락을 이해하기 어려웠습니다. 또한 자가수리 정보와 서비스센터 안내가 분리되어 있어, 문제 해결을 위해 사용자가 여러 채널을 직접 찾아야 하는 번거로움이 있었습니다.
+## 🎯 프로젝트 개요
 
-**Smart CS의 차별점**
+### 프로젝트 정보
+- **프로젝트명**: Smart CS (스마트 고객센터)
+- **개발 기간**: 3차(LangGraph RAG 챗봇) + 4차(Django 웹 서비스) 연속 프로젝트
+- **팀 구성**: 5명
+- **개발 환경**: Python 3.12, Django, FastAPI, LangGraph
 
-| | 내용 |
+### 프로젝트 배경
+
+기존 삼성전자 고객센터는 FAQ가 정해진 키워드에만 반응하여 사용자의 다양한 구어체 표현이나 복잡한 맥락을 이해하기 어렵습니다. 또한 자가수리 정보와 서비스센터 안내가 분리되어 있어, 문제 해결을 위해 사용자가 여러 채널을 직접 찾아야 하는 번거로움이 있습니다. 한국어만 지원하여 외국어 사용자가 이용하기 어렵고, 실제 서비스 환경에서 접근 가능한 웹 인터페이스도 부재했습니다.
+
+---
+
+## 💡 문제 정의 및 목표
+
+### 단계별 문제 해결
+
+#### 3차 프로젝트: LangGraph 기반 RAG 챗봇 개발
+
+**문제 의식**
+- 키워드 기반 검색의 맥락 부재 — 구어체 표현을 FAQ 검색에 연결하지 못함
+- 소프트웨어/하드웨어 문제를 한 번에 처리하는 통합 CS 시스템 부재
+- 자가수리 가이드와 서비스센터 안내가 분리된 불편함
+
+**해결 방안**
+- FAQ 1,850개 + 삼성 공식 자가수리 매뉴얼 PDF 기반 RAG 시스템 구축
+- LangGraph 조건부 라우팅으로 SW/HW 문제 자동 분기
+- ChromaDB + BM25 하이브리드 검색으로 검색 정확도 향상
+
+**3차 성과**
+
+| 지표 | 점수 |
 | --- | --- |
-| **멀티 소스 데이터 활용** | FAQ 1,850개와 휴대폰 모델별 공식 자가수리 매뉴얼 PDF를 결합하여 답변의 전문성 확보 |
-| **지능형 워크플로우** | 사용자의 의도(인사, 증상 문의, 센터 방문 등)를 실시간으로 분류하여 최적의 해결 경로로 유도 |
-| **End-to-End 솔루션** | 증상 진단부터 자가수리 가이드 제공, 인근 서비스센터 위치 안내까지 하나의 인터페이스에서 완결 |
+| DeepEval Answer Relevancy | 0.864 |
+| DeepEval Faithfulness | 0.883 |
+| RAGAS Context Precision | 0.865 |
+| RAGAS Context Recall | 0.857 |
+| RAGAS Faithfulness | 0.740 |
 
+**3차 챗봇을 사용하며 발견된 한계**
+- ❌ Streamlit 기반 로컬 실행 환경으로 실제 서비스 배포 불가
+- ❌ 한국어만 지원하여 외국어 사용자 접근 불가
+- ❌ 웹 표준 UI/UX 부재로 실사용자 경험 부족
+- ❌ 음성 입력 미지원으로 접근성 제한
 
-### 목표
+#### 4차 프로젝트: Django 풀스택 웹 서비스 구축
 
-**의도 분류 및 맥락 파악을 통한 사용자 경험 최적화**
+**목표**
+> "3차에서 구축한 RAG 챗봇을 실제 서비스 수준의 웹 애플리케이션으로 전환하고, 다국어 지원·음성인식을 추가하여 누구나 접근 가능한 AI 고객센터를 만든다."
 
-- **Conditional Routing** : 사용자의 질문에 따라 소프트웨어/하드웨어 문제를 자동 판별하고, 일반 상담과 기술 지원 노드를 동적으로 분기
-- **State Management** : 대화 상태(State)를 유지하여 멀티턴 대화에서도 기기 모델명과 이전 맥락을 놓치지 않게 함
-
-**고도화된 문서 검색 파이프라인(Hybrid Search)을 통한 정확도 향상**
-
-- FAQ 데이터의 제목 → ChromaDB (의미 기반 벡터 검색)
-- FAQ 데이터의 본문 → BM25 (키워드 기반 검색)
-- 의미상의 검색과 키워드 검색을 같이 활용하여 검색 정확도 향상
-
+**핵심 가치**
+- ✅ Django 풀스택으로 실서비스 수준의 웹 UI/UX 제공
+- ✅ 한국어/영어 자동 전환으로 외국어 사용자 지원
+- ✅ 음성인식으로 접근성 향상
+- ✅ Nginx + Docker 기반 클라우드 배포로 실제 서비스 환경 구축
 
 ---
 
-## 주요 기능
+## 🎨 주요 기능
 
-### 🔀 지능형 의도 파악 (Intent Routing)
+### 1. 🌐 다국어 지원 (한국어 / 영어)
+
+사용자가 상단 언어 토글에서 언어를 선택하면 전체 서비스가 해당 언어로 전환됩니다.
+
+**채팅 번역 파이프라인**
+- 영어로 질문 입력 → 백엔드에서 한국어로 번역 후 기존 RAG 처리 → 최종 답변을 다시 영어로 번역하여 반환
+
+**정적 번역**
+- 홈 화면 추천 칩(Battery, Charging, Wi-Fi), 기기 시리즈/모델 표시
+- `app.js`의 `T` 객체와 `applyTranslations()`가 담당
+- LLM 번역 없이 정적 치환 방식으로 처리하여 성능과 안정성 확보
+
+**동적 번역**
+- FAQ 제목, 본문, 관련 질문, 카테고리, 검색 결과 등 서버에서 내려오는 데이터도 번역
+- `views.py`에서 `translate_to_language()`를 사용해 `display_title`, `display_content` 등 표시용 필드를 생성하여 템플릿에 전달
+
+**언어 세션 동기화**
+- Django 세션에 `selected_language`를 저장하여 홈/FAQ/검색 어디서든 언어 변경 시 서버도 현재 언어를 인식
+- `/language/` 엔드포인트 추가 및 CSRF 처리 보강
+
+### 2. 🎙️ 음성인식
+
+브라우저 내장 Web Speech API(`window.SpeechRecognition`)를 활용하여 별도 설치 없이 마이크 음성 입력을 지원합니다.  
+현재 선택된 언어(한국어/영어)에 따라 인식 언어(`ko-KR` / `en-US`)를 자동으로 전환합니다.  
+인식된 텍스트는 채팅 입력창에 자동으로 채워지며, 마이크 권한 거부/네트워크 오류 등 에러 상황별 안내 메시지도 한국어/영어로 분기 처리됩니다.
+
+**처리 흐름**
+```
+마이크 버튼 클릭
+      ↓
+Web Speech API (SpeechRecognition) 시작
+lang = getCurrentLang() === "en" ? "en-US" : "ko-KR"
+      ↓
+음성 인식 결과 (transcript)
+      ↓
+채팅 입력창(#chat-question)에 자동 입력
+```
+
+### 3. 🔀 지능형 의도 파악 (Intent Routing)
+
 사용자의 메시지를 GPT-4 Turbo가 실시간으로 분석하여 **인사/잡담**, **기기 증상 문의**, **서비스센터 찾기** 3가지 의도로 자동 분류합니다.  
 멀티턴 대화 맥락을 고려하여 이전 대화 흐름에 맞는 응답을 제공합니다.
 
-### ⚡ Agentic RAG 파이프라인
-단순 문서 검색을 넘어 LangGraph 기반의 조건부 라우팅으로 **소프트웨어 문제 → FAQ 답변**, **하드웨어 문제 → 자가수리 가이드**, **검색 실패 → Fallback 안내**로 이어지는 동적 워크플로우를 수행합니다.
+### 4. ⚡ Agentic RAG 파이프라인
 
-### 🔍 하이브리드 검색
-ChromaDB 벡터 검색(의미 기반)과 BM25(키워드 기반)를 결합한 하이브리드 검색을 적용합니다.   
+LangGraph 기반의 조건부 라우팅으로 **소프트웨어 문제 → FAQ 답변**, **하드웨어 문제 → 자가수리 가이드**, **검색 실패 → Fallback 안내**로 이어지는 동적 워크플로우를 수행합니다.
+
+### 5. 🔍 하이브리드 검색
+
+ChromaDB 벡터 검색(의미 기반)과 BM25(키워드 기반)를 결합한 하이브리드 검색을 적용합니다.  
 LLM 쿼리 변환으로 일상적인 표현을 FAQ 검색에 최적화된 키워드로 변환하여 검색 정확도를 높입니다.
 
-### 🛠️ 자가수리 가이드
-사용자가 직접 수리 의향을 밝히면 선택한 기기 모델을 자동 감지하여 삼성 공식 수리 매뉴얼 기반의 단계별 분해·교체 절차를 안내합니다.  
+### 6. 🛠️ 자가수리 가이드
+
+사용자가 수리 의향을 밝히면 선택한 기기 모델을 자동 감지하여 삼성 공식 수리 매뉴얼 기반의 단계별 분해·교체 절차를 안내합니다.  
 자가수리 지원 모델 여부를 자동으로 판별합니다.
 
-### 📍 위치 기반 서비스센터 안내
+### 7. 📍 위치 기반 서비스센터 안내
+
 카카오맵 API와 연동하여 사용자 현재 위치 기반 반경 5km 이내 가까운 삼성전자 서비스센터 3곳의 이름, 주소, 거리를 실시간으로 안내합니다.
 
 ---
 
-## 프로젝트 디렉토리 구조
+## 🛠 기술 스택
 
-```
-SKN25-3rd-1Team/
-├── .venv/                             # 파이썬 가상 환경 (Git 추적 제외)
-├── data/                              # 데이터 및 DB 폴더 (Git 추적 제외)
-│   ├── bm25_index/                    # BM25 인덱스 파일 보관
-│   ├── logs/                          # 로그 데이터 보관
-│   ├── processed/                     # 전처리 완료된 데이터 (JSON 등)
-│   ├── raw/                           # 원본 파일 (CSV, PDF, MD 등)
-│   └── vector_store/                  # Chroma DB 등 벡터 저장소
-├── entrypoint/                        # 실행 진입점 스크립트 모음
-│   ├── check_db.py                    # DB 적재 상태 확인용 스크립트
-│   ├── ingest.py                      # 데이터 파싱 및 DB 적재 실행
-│   ├── main.py                        # FastAPI 백엔드 메인 실행 파일
-│   └── query.py                       # RAG 파이프라인 질의 테스트 스크립트
-├── frontend/                          # 사용자 인터페이스(UI) 코드
-│   ├── api/                           # FastAPI 백엔드 연동 API 모듈
-│   └── app.py                         # Streamlit 프론트엔드 실행 파일
-├── notebooks/                         # 데이터 분석 및 실험용 Notebook
-├── src/                               # 핵심 로직 및 LangGraph 소스 코드
-│   ├── pipelines/                     # 워크플로우별 파이프라인 모듈
-│   │   ├── embedding_pipeline.py      # 임베딩 및 벡터 저장소 관리
-│   │   ├── generation_pipeline.py     # 전체 RAG 파이프라인 통합 실행
-│   │   ├── ingestion_pipeline.py      # 데이터 전처리 및 초기 적재 로직
-│   │   └── self_repair_rag_pipeline.py# 자가수리 전용 PDR 검색 파이프라인
-│   ├── utils/                         # 공통 유틸리티
-│   │   ├── logger.py                  # Redis Stream 기반 로그 저장 모듈
-│   │   └── tasks.py                   # Celery 비동기 작업 및 로그 플러시
-│   ├── draw_graph.py                  # LangGraph 구조 시각화 스크립트
-│   ├── graph.py                       # LangGraph 워크플로우 구성 및 컴파일
-│   ├── nodes.py                       # LangGraph의 각 실행 노드 및 라우팅 정의
-│   └── state.py                       # GraphState 및 전체 상태 관리 구조
-├── .env                               # 로컬 환경 변수 파일 (Git 추적 제외)
-├── .env.example                       # 환경 변수 템플릿 파일
-├── .gitignore                         # Git 추적 예외 처리 파일
-├── Dockerfile                         # 애플리케이션 컨테이너화 설정
-├── requirements.txt                   # 파이썬 의존성 패키지 목록
-├── run_scripts.sh                     # 전체 서비스(Backend, UI, Redis, Celery) 통합 실행 스크립트
-├── agentic_rag_architecture.png       # RAG 시스템 아키텍처 다이어그램
-└── README.md                          # 프로젝트 설명서
-```
-Data 폴더는 최종 업데이트 버전이 Drive에 있습니다.
-[Data](https://drive.google.com/file/d/1J5VZ9PAkoRs1jwUX5nFJTevPlfh5n2vn/view?usp=drive_link)
-
----
-
-## 시스템 아키텍처
-
-### 전체 파이프라인
-
-Data Ingestion → Embedding → Vector Store (ChromaDB) → LangGraph Node Logic
-
-### LangGraph 워크플로우
-
-* **GraphState** 기반 상태 구조 정의로 노드 간 데이터 공유
-* **조건부 라우팅 (Conditional Edges)** 으로 Chat / Retrieve / Repair 동적 분기
-* **자가수리 분류기 (Self-Repair Classifier)** 로 기기 모델, 하드웨어 여부, 수리 의향 동시 판별
-* **Fail-over 에스컬레이션** 으로 FAQ → 자가수리 가이드 → 서비스센터 안내 단계적 처리
-
-### 시스템 아키텍처 다이어그램
-
-![시스템 아키텍처 1](https://github.com/user-attachments/assets/aab9c9d6-7c14-459a-8d38-e346744cf980)
-
-![시스템 아키텍처 2](https://github.com/user-attachments/assets/b31ebd44-0904-4a02-9444-410e52769fde)
-
-
-### 기술 스택
-
-
-| 구분 | 기술 |
-| --- | --- |
-| LLM & Framework | LangChain / LangGraph / GPT-4 Turbo |
-| Vector DB | ChromaDB / BM25 (rank-bm25) |
-| Backend | FastAPI + Uvicorn / Pydantic |
-| Frontend | Streamlit |
-| Database | MongoDB / Redis (Logging & Stream) |
-| Async Worker | Celery |
-| Container | Docker |
-| Language | Python 3.12 / Pandas / PyPDF |
-| External API | OpenAI API / 카카오맵 API |
-
----
-
-## 데이터 파이프라인과 모듈별 상세 설명
-
-### ingestion_pipeline.py
-
-**역할**
- 
-FAQ 데이터(CSV/Excel)와 자가수리 매뉴얼(MD) 파일을 읽어 벡터 DB(ChromaDB)와 BM25 인덱스에 적재하는 데이터 파이프라인입니다.
- 
-**주요 기능**
- 
-| 기능 | 설명 |
-| --- | --- |
-| **FAQ 적재** | CSV/Excel 파일에서 FAQ 데이터를 읽어 Title 기반으로 ChromaDB에 임베딩 적재 |
-| **BM25 인덱스 구축** | cleaned_content 기반 키워드 검색용 BM25 코퍼스를 `.pkl` 파일로 저장 |
-| **자가수리 적재** | MD 형식의 자가수리 매뉴얼을 청킹하여 ChromaDB에 적재 |
- 
-**처리 흐름**
- 
-```
-CSV/Excel 파일 로드
-    ↓
-Document 객체 생성
-    ├── ChromaDB용 (Title 임베딩)
-    └── BM25용 (cleaned_content 키워드)
-    ↓
-ChromaDB 배치 적재 (batch_size=150)
-    ↓
-BM25 코퍼스 pkl 파일 저장
-```
-### self_repair_rag_pipeline.py
-
-**역할**
-
-MD 파일을 수리 가이드 특성에 맞게 청킹하여 ChromaDB에 저장하고,  
-Parent Document Retrieval(PDR)로 정밀 검색을 수행하는 핵심 RAG 모듈입니다.  
-`nodes.py`의 `retrieve_node`에서 활용됩니다.
-
-**주요 기능**
-
-| 기능 | 설명 |
-| --- | --- |
-| **헤더 자동 감지** | 모델마다 다른 헤더 레벨(`#` / `##`) 자동 감지 후 통일 처리 |
-| **노이즈 필터링** | 이미지 캡션 잔재, 페이지번호, 차례 항목 등 자동 제거 |
-| **PDR 청킹** | Child(300자) / Parent(전체 섹션) 분리 저장으로 검색 정확도와 컨텍스트 풍부함 동시 달성 |
-| **모델명 자동 감지** | 구어체 모델명 → 공식 모델명 변환 (예: "S24 울트라" → `SM-S928N`) |
-| **쿼리 최적화** | 구어체 질문을 매뉴얼 전문 용어로 변환하여 검색 정확도 향상 |
-
-**처리 흐름**
-
-```
-MD 파일 로드 (mds/md_files/)
-    ↓
-헤더 레벨 자동 감지 + 노이즈 필터링
-    ↓
-Parent / Child 분리 청킹
-    ├── Child (300자, 검색용)  → samsung_cs_child 컬렉션
-    └── Parent (전체 섹션, LLM 전달용) → samsung_cs_parent 컬렉션
-    ↓
-retrieve_node 호출 시
-    Child로 정밀 검색
-        ↓
-    히트된 Child의 parent_id 추출
-        ↓
-    Parent(전체 섹션) → generate_node로 전달
-```
-
-**Parent Document Retrieval 설계 의도**
-
-기존 RAG의 딜레마를 해결하기 위해 도입
-
-| 방식 | 문제점 |
-| --- | --- |
-| 청크 크게 | 여러 내용이 섞여 벡터 희석 → 검색 부정확 |
-| 청크 작게 | LLM에 전달되는 컨텍스트 부족 → 답변 품질 저하 |
-| **PDR (채택)** | 작은 청크로 정밀 검색 + 전체 섹션으로 풍부한 컨텍스트 전달 |
-### embedding_pipeline.py
-
-**역할**
-
-ChromaDB 벡터 저장소를 생성하거나 불러오는 모듈입니다.  
-OpenAI 임베딩 모델을 사용해 텍스트를 벡터로 변환하고, 컬렉션 이름 기반으로 독립적인 저장소를 관리합니다.
-
-**주요 기능**
-
-| 기능 | 설명 |
-| --- | --- |
-| **벡터 저장소 로드** | 컬렉션 이름(`faq`, `self-repair`)으로 ChromaDB 저장소 생성 또는 로드 |
-| **임베딩 모델** | OpenAI `text-embedding-3-small` 모델 사용 |
-| **저장 경로 관리** | `.env`의 `CHROMA_PERSIST_DIR` 경로 기반으로 물리적 저장소 관리 |
-
-### generation_pipeline.py
-
-**역할**
-
-LangGraph RAG 파이프라인을 실행하고 최종 답변을 생성하는 모듈입니다.  
-MongoDB와 연동하여 대화 로그를 저장하고 관리합니다.
-
-**주요 기능**
-
-| 기능 | 설명 |
-| --- | --- |
-| **답변 생성** | LangGraph `rag_app`을 통해 사용자 질문에 대한 최종 답변 생성 |
-| **대화 로그 저장** | MongoDB에 질문, 답변, 기기 정보, 신뢰도 점수 등 대화 기록 적재 |
-| **멀티턴 지원** | `thread_id` 기반으로 대화 히스토리 유지 |
-| **오류 처리** | 파이프라인 오류 발생 시 에러 로그 저장 후 안전하게 반환 |
-
-**처리 흐름**
-```
-사용자 질문 수신
-    ↓
-MongoDB 로그 초기화 (status: pending)
-    ↓
-LangGraph rag_app 실행 (Node별 시간 측정 및 Redis Stream 기록)
-    ↓
-최종 답변 추출
-    ↓
-MongoDB 로그 업데이트 (status: success / error)
-    ↓
-Redis Stream 데이터를 Celery Worker가 MongoDB로 영구 저장 (Flush)
-    ↓
-결과 반환
-```
-
-### nodes.py
-
-**역할**
-
-LangGraph의 각 노드와 라우팅 함수를 정의하는 핵심 모듈입니다.  
-사용자 질문을 분류하고 FAQ 검색, 답변 생성, 자가수리 안내, 서비스센터 안내 등을 처리합니다.
-
-**노드 구성**
-
-| 노드명 | 역할 |
-| --- | --- |
-| `chat_node` | 인사/잡담 응대 및 대화 요약 처리 (Few-shot 프롬프트 적용) |
-| `retrieve_node` | LLM 쿼리 변환 + ChromaDB 벡터 검색 + BM25 하이브리드 검색 |
-| `generate_node` | 검색된 FAQ 문서 기반 단계별 답변 생성 (CoT 프롬프트 적용) |
-| `self_repair_classifier_node` | 기기 모델명, 하드웨어 여부, 자가수리 의향 동시 판별 |
-| `self_repair_guide_node` | 자가수리 매뉴얼 RAG 검색 및 가이드 제공 |
-| `nearest_center_node` | 카카오맵 API 기반 주변 서비스센터 안내 |
-| `fallback_node` | FAQ 검색 실패 시 선택지 제공 |
-
-**라우팅 구성**
-
-| 라우팅 함수 | 역할 |
-| --- | --- |
-| `route_question` | 진입점 라우터 - 인사/기기문의/센터방문 분류 |
-| `route_issue_type` | SW/HW/센터방문 분류 후 다음 노드 결정 |
-| `route_after_self_repair_check` | 자가수리 가능 여부에 따라 가이드 또는 센터 안내 |
-
-### graph.py
-
-**역할**
-
-LangGraph를 사용하여 전체 CS RAG 워크플로우를 구성하고 컴파일하는 모듈입니다.  
-노드와 라우팅 함수를 연결하여 대화 흐름을 정의합니다.
-
-**그래프 구조**
-
-<img width="967" height="432" alt="agentic_rag_architecture" src="https://github.com/user-attachments/assets/d020dedd-4b1b-466a-80c9-fd133382239c" />
-
-
-**주요 특징**
-
-| 항목 | 설명 |
-| --- | --- |
-| **MemorySaver** | 멀티턴 대화 히스토리를 메모리에 유지 |
-| **싱글톤 인스턴스** | `rag_app` 으로 앱 전역에서 단일 인스턴스 공유 |
-| **조건부 라우팅** | `route_question`, `route_issue_type`, `route_after_self_repair_check` 로 동적 흐름 제어 |
-
----
-### 라우팅 함수
-
-| 함수 | 역할 | 판단 로직 | 연결 노드 |
-| --- | --- | --- | --- |
-| **사용자 질문 의도 구분 함수** | 사용자의 첫 메시지를 분석하여 어떤 노드로 보낼지 결정 | 질문의 맥락이 단순 인사인지, 기술적 결함인지, 위치 정보 요청인지를 분석 | 일상 대화 → **일반 대화 응대 노드**<br>기술/수리 문의 → **휴대폰 수리 응대 노드**<br>위치/센터 문의 → **서비스 센터 안내 노드** |
-| **문제 종류 구분 함수** | 휴대폰 수리 응대 노드에서 검색된 문서를 기반으로 문제 유형을 분류 | 휴대폰 수리 응대 노드에서 검색된 문서와 질문의 연관성을 대조 | SW 이슈 → **소프트웨어 문제 응대 노드**<br>HW 이슈 → **하드웨어 문제 응대 노드**<br>데이터 부족/검색 실패 → **사용자 의도 파악 노드** |
-| **자가수리 관련 구분 함수** | 수리 난이도, 부품 보유 여부, 사용자의 자가 조치 의향을 최종 확인 | 지원 모델 리스트와 사용자의 수락 여부를 매칭 | 자가수리 적합 → **자가 수리 안내 노드**<br>수리 불가/방문 선호 → **서비스 센터 안내 노드** |
-
----
-## Streamlit 주요 기능 및 UI/UX 구현 포인트
-
-**고객의 질문을 먼저 읽는 '선제적 추천 UI'**
-* **기획 의도 :** '액정 파손', '전원 안 켜짐' 등 자주 발생하는 치명적인 문제는 빠르게 접근할 수 있어야 한다고 판단했습니다
-* **기술적 해결:** FAQ 데이터의 조회수(`viewCnt`)를 분석해 **'인기 질문 Top 6'를 메인 화면 상단에 배치**했습니다. 고객은 긴 타이핑 없이 단 한 번의 클릭만으로 즉시 AI 상담 파이프라인(FastAPI)과 연결되어 해결책을 제공받을 수 있습니다
-
-**맥락이 끊기지 않는 매끄러운 상담 흐름 (SPA구현)**
-* **문제 인식 :** 기존 고객센터의 가장 큰 불만인 페이지를 이동할 때마다 내 기기 정보나 이전 질문을 다시 입력해야 한다는 점을 해결 .
-* **기술적 해결 :** `st.session_state`를 활용해 **단일 페이지 애플리케이션**처럼 동작하게 구현했습니다. 고객이 사이드바에서 선택한 '기기 모델명'이 세션에 안전하게 유지되며, '자주 묻는 질문(FAQ)' 뷰와 'AI 상담' 뷰를 오가더라도 정보가 초기화되지 않고 유기적으로 연결됩니다.
-
-**속도와 비용을 모두 잡은 스마트 하이브리드 라우팅**
-* **문제 인식:** 모든 질문을 생성형 AI에 맡기면 응답 지연과 API 비용이 증가합니다.
-* **기술적 해결:** 정형화된 FAQ 카테고리 검색을 지원하며, 필요에 따라 **1차적으로 정제된 매뉴얼을 우선 검토하고, 추가 분석이 필요할 때만 RAG 기반 백엔드를 호출**하도록 스마트 라우팅 로직을 설계했습니다. 이를 통해 대기 시간을 최소화하고 인프라 비용을 절감했습니다.
----
-## 성능 평가
-
-총 4단계에 걸쳐 DeepEval과 RAGAS를 활용한 단계적 성능 평가를 진행했습니다.
-
-| 단계 | 도구 | 내용 |
-| --- | --- | --- |
-| Step 1 | DeepEval | 디버깅용 샘플 10개 적용 · 문제 유형 파악 |
-| Step 2 | DeepEval | 샘플 확대 (random 30개) · 전체 응답 흐름 및 성능 확인 |
-| Step 3 | RAGAS | reference 데이터 추가 후 정답 기준 정량 평가 도입 |
-| Step 4 | RAGAS | 전체 질문 50개로 확장 · 최종 성능 확인 |
-
-### DeepEval 평가 결과
-
-| 지표 | 점수 | 설명 |
-| --- | --- | --- |
-| Answer Relevancy | 0.864 | 답변이 질문 의도에 부합하는 정도 |
-| Faithfulness | 0.883 | 답변이 검색 문서에 기반한 정도 (환각 방지) |
-
-### RAGAS 평가 결과
-
-| 지표 | 점수 | 설명 |
-| --- | --- | --- |
-| Faithfulness | 0.740 | 답변이 검색 문서에 충실한 정도 |
-| Context Precision | 0.865 | 검색된 문서가 질문과 관련 있는 정도 |
-| Context Recall | 0.857 | 필요한 문서를 빠짐없이 검색한 정도 |
-
-전반적으로 0.8 이상의 높은 신뢰도를 보였으며, Faithfulness는 프롬프트 엔지니어링 고도화를 통해 추가 개선이 가능합니다.
-
----
-## 시연 결과
-
-### 📹 시연 영상
-
-[![Smart CS 시연 영상](https://img.youtube.com/vi/7quXGa9SLEc/0.jpg)](https://www.youtube.com/watch?v=7quXGa9SLEc)
-
-> **LangGraph 기반 CS 챗봇 SMART CS 시연 영상**
-
----
-
-## 기술 스택
-
-### Backend
+### Backend & AI
 
 | 구분 | 기술 | 설명 |
 | --- | --- | --- |
-| 언어 | ![Python](https://img.shields.io/badge/Python_3.12-3776AB?style=flat-square&logo=python&logoColor=white) | 전체 파이프라인 구현 핵심 언어 |
-| LLM | ![GPT-4](https://img.shields.io/badge/GPT--4_Turbo-412991?style=flat-square&logo=openai&logoColor=white) | 답변 생성, 의도 분류, 쿼리 변환 |
-| RAG Framework | ![LangChain](https://img.shields.io/badge/LangChain-121212?style=flat-square&logo=chainlink&logoColor=white) ![LangGraph](https://img.shields.io/badge/LangGraph-121212?style=flat-square&logo=chainlink&logoColor=white) | 하이브리드 검색 + 조건부 라우팅 RAG 파이프라인 |
-| 임베딩 | ![OpenAI](https://img.shields.io/badge/text--embedding--3--small-412991?style=flat-square&logo=openai&logoColor=white) | 텍스트 벡터 임베딩 |
-| 웹 프레임워크 | ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white) ![Uvicorn](https://img.shields.io/badge/Uvicorn-499848?style=flat-square&logo=gunicorn&logoColor=white) | 고성능 비동기 API 서버 |
-| 데이터 검증 | ![Pydantic](https://img.shields.io/badge/Pydantic-E92063?style=flat-square&logo=pydantic&logoColor=white) | 구조화된 출력 및 데이터 검증 |
-| 비동기 작업 | ![Celery](https://img.shields.io/badge/Celery-37814A?style=flat-square&logo=celery&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) | 스케줄러 및 비동기 태스크 처리 |
+| LLM | GPT-4 Turbo | 답변 생성, 의도 분류, 쿼리 변환, 번역 |
+| RAG Framework | LangChain / LangGraph | 하이브리드 검색 + 조건부 라우팅 RAG 파이프라인 |
+| 임베딩 | text-embedding-3-small | 텍스트 벡터 임베딩 |
+| AI Backend | FastAPI + Uvicorn | LangGraph 서빙 및 언어 파라미터 수신 |
+| 데이터 검증 | Pydantic | 구조화된 출력 및 데이터 검증 |
+| 비동기 작업 | Celery + Redis | 스케줄러 및 비동기 로그 플러시 |
+| 음성인식 | Web Speech API (브라우저 내장) | 마이크 음성 입력 → 채팅 텍스트 자동 전환 |
 
-### Frontend
+### Frontend & Web
 
 | 구분 | 기술 | 설명 |
 | --- | --- | --- |
-| UI | ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white) | 챗봇 인터페이스 |
+| Web Framework | Django 풀스택 | 템플릿 렌더링, 세션 관리, 번역 처리 |
+| Frontend | HTML5 / CSS3 / JavaScript | 언어 토글, 채팅 UI, 음성인식 인터페이스 |
 
 ### Data & Storage
 
 | 구분 | 기술 | 설명 |
 | --- | --- | --- |
-| 벡터 DB | ![ChromaDB](https://img.shields.io/badge/ChromaDB-FF6F00?style=flat-square) | FAQ 및 자가수리 임베딩 저장·검색 |
-| 키워드 검색 | ![BM25](https://img.shields.io/badge/BM25-4285F4?style=flat-square) | 키워드 기반 하이브리드 검색 |
-| 로그 DB | ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white) | 대화 로그 및 사용 기록 저장 |
-| 캐시 | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) | Celery 브로커 및 캐시 |
-| 데이터 처리 | ![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white) ![OpenPyXL](https://img.shields.io/badge/OpenPyXL-217346?style=flat-square&logo=microsoftexcel&logoColor=white) | FAQ 데이터 전처리 및 Excel 파싱 |
-| PDF 파싱 | ![PyPDF](https://img.shields.io/badge/PyPDF-EC1C24?style=flat-square) | 자가수리 매뉴얼 PDF 파싱 |
-| 비동기 & 스트림 | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) ![Celery](https://img.shields.io/badge/Celery-37814A?style=flat-square&logo=celery&logoColor=white) | 노드별 성능 측정(Stream) 및 비동기 로그 플러시 |
+| 벡터 DB | ChromaDB | FAQ 및 자가수리 임베딩 저장·검색 |
+| 키워드 검색 | BM25 (rank-bm25) | 키워드 기반 하이브리드 검색 |
+| 로그 DB | MongoDB | 대화 로그 및 사용 기록 저장 |
+| 캐시 | Redis | Celery 브로커 및 Stream 로그 |
+| DB | SQLite3 | Django 기본 데이터베이스 |
+
+### DevOps
+
+| 구분 | 기술 | 설명 |
+| --- | --- | --- |
+| Container | Docker | 애플리케이션 컨테이너화 |
+| Web Server | Nginx | 리버스 프록시 |
+| External API | OpenAI API / 카카오맵 API | LLM 및 서비스센터 위치 검색 |
 
 ---
 
-## 환경 구축 및 실행 방법
+## 🏗 시스템 아키텍처
 
-### 환경 구축 (uv 사용 시)
+### 전체 구조
+
+```
+사용자 브라우저
+      ↓
+Nginx (리버스 프록시)
+      ↓
+Django (Port 8010)
+  — HTML/CSS/JS 프론트엔드
+  — 언어 세션 관리 (selected_language)
+  — 정적/동적 번역 처리 (translate_to_language)
+  — FastAPI 연동 서비스
+      ↓
+FastAPI (Port 8000)
+  — LangGraph AI 서빙
+  — 언어 파라미터 수신 → 번역 파이프라인 실행
+      ↓
+┌──────────────────────────────────────────────────┐
+│  MongoDB   │  ChromaDB + BM25  │  Redis + Celery │
+│         OpenAI API  │  카카오맵 API               │
+└──────────────────────────────────────────────────┘
+```
+
+### LangGraph 워크플로우
+
+```
+사용자 질문 수신
+      ↓
+translate_input_node  ← 영어 선택 시 한국어로 번역
+      ↓
+route_question  →  인사/잡담     →  chat_node
+              →  기기 증상 문의  →  retrieve_node
+              →  센터 방문      →  nearest_center_node
+      ↓ (기기 증상 문의 경로)
+retrieve_node  →  LLM 쿼리 변환 + ChromaDB + BM25 하이브리드 검색
+      ↓
+route_issue_type  →  SW 이슈  →  generate_node
+                →  HW 이슈  →  self_repair_classifier_node
+                →  Fallback →  fallback_node
+      ↓ (HW 경로)
+self_repair_classifier_node
+      ↓
+route_after_self_repair_check  →  자가수리 가능  →  self_repair_guide_node
+                              →  수리 불가/방문 →  nearest_center_node
+      ↓
+translate_output_node  ← 영어 선택 시 영어로 재번역
+      ↓
+최종 답변 반환
+```
+
+### 노드 구성
+
+| 노드명 | 역할 |
+| --- | --- |
+| `translate_input_node` | 영어 질문을 한국어로 번역 |
+| `translate_output_node` | 한국어 답변을 영어로 번역 |
+| `chat_node` | 인사/잡담 응대 및 대화 요약 처리 |
+| `retrieve_node` | LLM 쿼리 변환 + ChromaDB + BM25 하이브리드 검색 |
+| `generate_node` | 검색된 FAQ 문서 기반 단계별 답변 생성 |
+| `self_repair_classifier_node` | 기기 모델명, 하드웨어 여부, 자가수리 의향 동시 판별 |
+| `self_repair_guide_node` | 자가수리 매뉴얼 RAG 검색 및 가이드 제공 |
+| `nearest_center_node` | 카카오맵 API 기반 주변 서비스센터 안내 |
+| `fallback_node` | FAQ 검색 실패 시 선택지 제공 |
+
+---
+
+## 📁 프로젝트 디렉토리 구조
+
+```
+SKN25-4th-1Team/
+├── .env                               # 로컬 환경 변수 파일 (Git 추적 제외)
+├── .env.example                       # 환경 변수 템플릿 파일
+├── .gitignore
+├── Dockerfile                         # 애플리케이션 컨테이너화 설정
+├── docker-compose.yml                 # FastAPI, Django, Nginx, Redis, MongoDB, Celery 통합 실행
+├── docker/
+│   └── nginx/
+│       └── default.conf               # Nginx 리버스 프록시 설정
+├── requirements.txt
+├── data/                              # 벡터 DB, BM25 인덱스, 원천/전처리 데이터
+│   ├── bm25_index/
+│   ├── processed/
+│   ├── raw/
+│   └── vector_store/
+├── django_frontend/                   # Django 풀스택 웹 애플리케이션
+│   ├── config/                        # Django 프로젝트 설정
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   ├── asgi.py
+│   │   └── wsgi.py
+│   ├── manage.py
+│   ├── db.sqlite3
+│   └── smartcs/                       # Smart CS 앱
+│       ├── static/smartcs/
+│       │   ├── css/app.css            # 전체 스타일시트
+│       │   ├── js/app.js              # 언어 토글·채팅·음성인식 프론트엔드 로직
+│       │   └── images/
+│       ├── templates/smartcs/
+│       │   ├── base.html              # 공통 레이아웃 (언어 토글 포함)
+│       │   ├── home.html              # 메인 채팅 화면
+│       │   ├── faq.html               # FAQ 화면
+│       │   ├── search.html            # 검색 화면
+│       │   ├── service_centers.html   # 서비스센터 안내 화면
+│       │   ├── login.html             # 로그인 화면
+│       │   └── signup.html            # 회원가입 화면
+│       ├── views.py                   # 뷰 로직 (동적 번역 처리 포함)
+│       ├── services.py                # FastAPI 연동 서비스 모듈
+│       ├── data.py                    # FAQ 토픽 등 정적 데이터
+│       └── urls.py                    # URL 라우팅 (/language/ 엔드포인트 포함)
+├── entrypoint/                        # FastAPI AI 서빙 진입점
+│   ├── main.py                        # FastAPI 메인 실행 파일
+│   ├── ingest.py                      # 데이터 파싱 및 DB 적재
+│   ├── check_db.py                    # DB 적재 상태 확인
+│   └── query.py                       # RAG 파이프라인 질의 테스트
+├── src/                               # LangGraph 핵심 로직
+│   ├── pipelines/
+│   │   ├── generation_pipeline.py     # 전체 RAG 파이프라인 통합 실행
+│   │   ├── embedding_pipeline.py      # 임베딩 및 벡터 저장소 관리
+│   │   ├── ingestion_pipeline.py      # 데이터 전처리 및 적재
+│   │   └── self_repair_rag_pipeline.py# 자가수리 전용 RAG 파이프라인
+│   ├── utils/
+│   │   ├── translator.py              # 다국어 번역 모듈 (4차 신규)
+│   │   ├── logger.py                  # Redis Stream 기반 로그 저장
+│   │   └── tasks.py                   # Celery 비동기 작업 및 로그 플러시
+│   ├── graph.py                       # LangGraph 워크플로우 구성 및 컴파일
+│   ├── nodes.py                       # LangGraph 노드 및 라우팅 정의
+│   └── state.py                       # GraphState 및 상태 관리 구조
+└── eval/                              # 성능 평가 모듈
+    ├── deepeval_runner.py
+    ├── ragas_runner.py
+    └── dataset/
+```
+
+---
+
+## 🔑 핵심 구현 내용
+
+### 다국어 파이프라인 — translator.py
+
+**역할**  
+사용자의 언어 선택을 기반으로 입력/출력 번역을 처리하는 다국어 지원 모듈입니다.
+
+**처리 흐름**
+```
+영어 질문 입력
+    ↓
+translate_input_node — 영어 → 한국어 번역
+    ↓
+기존 RAG 파이프라인 (ChromaDB + BM25 + LangGraph)
+    ↓
+translate_output_node — 한국어 답변 → 영어 번역
+    ↓
+영어 답변 반환
+```
+
+**번역 방식 구분**
+
+| 구분 | 방식 | 적용 범위 |
+| --- | --- | --- |
+| 채팅 번역 | LLM 번역 (translator.py) | 질문 입력, 챗봇 답변 |
+| 동적 번역 | LLM 번역 (views.py) | FAQ 제목, 본문, 관련 질문, 검색 결과 |
+| 정적 번역 | 정적 치환 (app.js T 객체) | 홈 추천 칩, 기기 모델명, UI 고정 문구 |
+
+### 프론트엔드 구현 — app.js
+
+**다국어 정적 번역 시스템**
+
+`T` 객체에 한국어/영어 번역 키-값을 정의하고, `data-i18n` 속성이 붙은 DOM 요소에 `applyTranslations()`로 일괄 적용합니다.  
+선택된 언어는 `localStorage`에 저장되어 페이지 이동 후에도 유지됩니다.
+
+```
+언어 토글 버튼 클릭
+      ↓
+setLanguage(lang) → localStorage 저장
+      ↓
+applyTranslations(lang) → data-i18n 속성 요소 일괄 번역
+      ↓
+/language/ 엔드포인트 → Django 세션 동기화
+```
+
+**커버리지 범위**
+
+| 구분 | 항목 |
+| --- | --- |
+| 네비게이션 | FAQ, Service Centers, Login, Sign Up |
+| 홈 화면 | 히어로 타이틀, 기기 시리즈/모델 라벨, 검색 플레이스홀더 |
+| FAQ | 제목, 검색창, 인기 주제, 관련 질문, 목록으로 버튼 |
+| 검색 | 정렬 옵션, 카테고리 필터, 빈 결과 안내 |
+| 서비스센터 | 안내 문구, 좌표 입력 플레이스홀더, 조회 버튼 |
+| 로그인/회원가입 | 폼 라벨, 플레이스홀더, 제출 버튼 |
+
+**채팅 SPA 구조**
+
+페이지 이동 없이 채팅이 동작하도록 SPA 방식으로 구현했습니다.  
+사용자 메시지와 어시스턴트 답변을 동적으로 렌더링하고, 대화 기록 유무에 따라 홈 화면 레이아웃을 자동 전환합니다.
+
+**기기 시리즈/모델 연동**
+
+시리즈 선택 시 해당 시리즈의 모델 목록을 동적으로 렌더링하고, 선택된 모델을 `/device/` 엔드포인트로 서버에 즉시 동기화합니다.
+
+---
+
+### Django 뷰 구현 — views.py
+
+**채팅 세션 관리**
+
+Django 세션을 활용하여 대화 히스토리, thread_id, 선택된 기기 모델을 서버 측에서 유지합니다.  
+새 세션 진입 시 초기 어시스턴트 메시지와 고유 thread_id를 자동 생성합니다.
+
+| 엔드포인트 | 역할 |
+| --- | --- |
+| `GET /` | 홈 화면 렌더링 (대화 히스토리, 기기 목록, 인기 질문 포함) |
+| `POST /chat/` | 질문 수신 → FastAPI 전달 → 답변 반환, 세션에 대화 기록 저장 |
+| `POST /chat/reset/` | 대화 초기화, 새 thread_id 발급 |
+| `POST /device/` | 선택된 기기 모델 세션 저장 |
+| `GET /faq/` | FAQ 브라우저 렌더링 (인기 주제, 질문 상세 포함) |
+| `GET /search/` | 키워드/카테고리/정렬 기반 FAQ 검색 |
+| `GET /service-centers/` | 위도·경도 기반 카카오맵 API 서비스센터 조회 |
+
+**채팅 답변 우선순위**
+
+```
+사용자 질문 수신
+      ↓
+answer_override 있으면 그대로 사용 (인기 질문 클릭 시)
+      ↓
+find_direct_answer() — 로컬 데이터에서 즉시 답변 가능하면 반환
+      ↓
+chat_with_fastapi() — LangGraph RAG 파이프라인 호출
+      ↓
+세션에 대화 기록 저장 후 반환
+```
+
+**FAQ 검색 필터링**
+
+pandas DataFrame 기반으로 카테고리 필터, 키워드 검색(제목+본문), 정렬(최신순/조회순/제목순)을 조합하여 처리합니다.
+
+---
+
+### 하이브리드 검색 — retrieve_node
+
+**설계 의도**
+
+| 방식 | 특징 |
+| --- | --- |
+| ChromaDB (벡터 검색) | 의미 기반으로 유사한 맥락의 문서 검색 |
+| BM25 (키워드 검색) | 정확한 단어 매칭으로 누락 없는 검색 |
+| **하이브리드 (채택)** | 두 방식의 결과를 결합하여 검색 정확도 향상 |
+
+### 자가수리 PDR 파이프라인 — self_repair_rag_pipeline.py
+
+**Parent Document Retrieval 설계 의도**
+
+| 방식 | 문제점 |
+| --- | --- |
+| 청크 크게 | 여러 내용이 섞여 벡터 희석 → 검색 부정확 |
+| 청크 작게 | LLM에 전달되는 컨텍스트 부족 → 답변 품질 저하 |
+| **PDR (채택)** | 작은 청크(300자)로 정밀 검색 + 전체 섹션으로 풍부한 컨텍스트 전달 |
+
+---
+
+## 🏆 3차 → 4차 개선 포인트
+
+| 구분 | 3차 Smart CS | 4차 Smart CS |
+| --- | --- | --- |
+| **프론트엔드** | Streamlit | Django + HTML/CSS/JS |
+| **배포 환경** | 로컬 실행 | Nginx + Docker 클라우드 배포 |
+| **언어 지원** | 한국어만 | ✅ 한국어/영어 전환 + 동적 번역 |
+| **음성 입력** | ❌ 없음 | ✅ 브라우저 마이크 음성인식 |
+| **포트 구성** | FastAPI 8000 + Streamlit 8501 | Django 8010 + FastAPI 8000 |
+| **번역 처리** | ❌ 없음 | ✅ 채팅/동적/정적 3단계 번역 파이프라인 |
+
+---
+
+## 📡 API 명세
+
+### Django 엔드포인트
+
+| Method | Path | 설명 |
+| --- | --- | --- |
+| GET | `/` | 홈 채팅 화면 |
+| GET | `/faq/` | FAQ 상세 및 인기 주제 화면 |
+| GET | `/search/` | FAQ 검색 및 필터 화면 |
+| GET | `/service-centers/` | 서비스센터 조회 화면 |
+| GET | `/accounts/login/` | 로그인 화면 |
+| GET | `/accounts/signup/` | 회원가입 화면 |
+| POST | `/chat/` | 채팅 AJAX API |
+| POST | `/chat/reset/` | 대화 초기화 |
+| POST | `/device/` | 선택 기기 세션 저장 |
+| POST | `/language/` | 선택 언어 세션 저장 |
+
+### FastAPI 엔드포인트
+
+| Method | Path | 설명 |
+| --- | --- | --- |
+| POST | `/api/chat` | 상담 요청 처리 |
+
+**Request Body**
+```json
+{
+  "question": "사용자 질문",
+  "selected_device": "SM-S921N",
+  "thread_id": "uuid",
+  "selected_language": "korean 또는 english"
+}
+```
+
+**Response Body**
+```json
+{
+  "answer": "생성된 답변"
+}
+```
+
+오류 발생 시 HTTP 500과 detail 반환
+
+---
+
+## 🌐 환경 구축 및 실행 방법
+
+### 환경 구축
+
 ```bash
-# 가상환경 생성 및 의존성 설치
 uv venv --python 3.12
 source .venv/bin/activate
 uv pip install -r requirements.txt
 ```
 
 ### 데이터 적재
+
 ```bash
 python -m entrypoint.ingest
 ```
 
-### 통합 실행 (Redis, Celery, Backend, UI)
+### Docker Compose 통합 실행 (권장)
+
 ```bash
-# 모든 서비스를 일괄 실행 (Redis 서버가 로컬에 설치되어 있어야 함)
-chmod +x run_scripts.sh
-./run_scripts.sh
+# .env 파일 준비 후 API 키 등 필요한 값을 채웁니다.
+cp .env.example .env
+
+# FastAPI, Django, Nginx, Redis, MongoDB, Celery를 한 번에 실행합니다.
+docker compose up -d --build
 ```
 
-### 개별 실행
-```bash
-# 백엔드 API
-python -m uvicorn entrypoint.main:app --reload
+브라우저에서 아래 주소로 접속합니다.
 
-# 프론트엔드 UI
-streamlit run frontend/app.py
+```text
+http://127.0.0.1:8010
 ```
 
-### Docker 실행
+Compose 실행 시 Nginx가 브라우저 진입점이 되고, Django는 내부에서 FastAPI API를 호출합니다.
+
+| 서비스 | 역할 | 주소 |
+| --- | --- | --- |
+| `nginx` | 브라우저 진입점 및 리버스 프록시 | `http://127.0.0.1:8010` |
+| `django` | Django 웹 프론트엔드 | `django:8010` |
+| `fastapi` | LangGraph RAG API | `fastapi:8000` |
+| `redis` | Celery 브로커 및 Stream 로그 | `redis:6379` |
+| `mongo` | 대화 로그 저장소 | `mongo:27017` |
+| `celery` | 비동기 로그 처리 워커 | - |
+
 ```bash
-docker build -t samsung-cs-agent .
-docker run -p 8000:8000 -p 8501:8501 samsung-cs-agent
+# 실행 상태 확인
+docker compose ps
+
+# 로그 확인
+docker compose logs -f
+
+# 서비스 종료
+docker compose down
+```
+
+### 로컬 개별 실행
+
+```bash
+# 터미널 1: FastAPI AI 서버
+python -m uvicorn entrypoint.main:app --reload --host 127.0.0.1 --port 8000
+
+# 터미널 2: Django 웹 프론트엔드
+python django_frontend/manage.py runserver 127.0.0.1:8010
+```
+
+브라우저에서 아래 주소로 접속합니다.
+
+```text
+http://127.0.0.1:8010
+```
+
+### 환경 변수 설정 (.env)
+
+```
+OPENAI_API_KEY=your_openai_api_key
+KAKAO_API_KEY=your_kakao_api_key
+MONGO_URI=your_mongodb_uri
+CHROMA_PERSIST_DIR=./data/vector_store
+FASTAPI_URL=http://127.0.0.1:8000/api/chat
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_DB=0
 ```
 
 ---
-## 향후 개발 계획
 
-사용자가 많을 때를 가정하여 redis와, 많이 하는 질문 탭을 설계하였었습니다. 향후에는 클라우드를 통한 웹 서버 연결을 진행하여 실제 환경을 구축하고자 하며, 로그가 쌓이면 이를 기반으로 챗봇 서비스를 발전시키고자 합니다.
+## 🚀 향후 개발 계획
+
+### 아쉬운 점
+**1. RAGAS Faithfulness 개선 여지**
+- 3차 기준 0.740으로 다른 지표 대비 낮은 수치
+- generate_node 프롬프트 엔지니어링 추가 고도화 필요
+
+**2. 다국어 확장**
+- 현재 한국어/영어 2개 언어만 지원
+- 일본어, 중국어 등 추가 언어 지원 검토
+
+
+### 향후 개선 계획
+- 📊 **대시보드 고도화**: MongoDB 로그 데이터 기반 실시간 통계 시각화
+- 🌍 **다국어 확장**: 영어 외 추가 언어 지원
+- 📱 **모바일 최적화**: 반응형 디자인 고도화
 
 ---
 
 ## 💬 한 줄 회고
 
 > #### 김나연
-> DB, 메시지 큐, 컨테이너를 통한 로그 관리부터 Langgraph 기반 로직 설계, Frontend까지 전 과정이 어떻게 작동하는지 확인할 수 있는 프로젝트였습니다. 모든 팀원이 성실히 참여해주셔서 무리없이 프로젝트를 마무리 지을 수 있었음에 감사의 말씀을 전합니다. 향후 진행되는 프로젝트에서는 API 명세서를 작성해보는 작업을 진행하면 더 좋을 것 같다고 생각하였습니다. 
+>
 
 ---
 
 > #### 김지현
-> 평가 지표 deepeval, ragas를 사용한 품질 검증을 통해 전체 흐름을 경험할 수 있었던 프로젝트였습니다. 팀원들의 도움으로 각 단계가 어떻게 유기적으로 연결되는지 이해할 수 있었습니다. 모든 팀원분들이 열정적으로 맡은 바 임해주셔서 감사합니다. 
+>
 
 ---
 
 > #### 박범수
->문서 전처리부터 벡터 임베딩, 검색 시스템까지 이어지는 RAG 파이프라인을 구현하면서, 직접 구현 해보니 좋은 성능의 LLM을 만들기 위해서 필요한 과정들에 대해 잘 알게 되었다. 이번 경험을 통해 아직 채워나가야 할 지식이 많다는 것을 깨달았고, 다음 학습 목표를 세울 수 있었던 시간이었다 
+>
 
 ---
 
 > #### 이하윤
->PDF 파싱부터 청킹, 벡터DB 구축, RAG 파이프라인까지 데이터가 흘러가는 전 과정을 직접 구현하면서, 좋은 답변은 좋은 데이터에서 나온다는 것을 몸으로 배웠다. 유능한 팀원들 덕분에 많은 자극을 받을 수 있었고 도움도 받았던 프로젝트였다.
+>
 
 ---
 
 > #### 여해준
-> LLM을 활용한 챗봇 개발을 진행하면서 프롬프트를 얼마나 잘짜냐에 따라서 챗봇이 바보가 되냐 아니냐가 정해지는지를 깨달았습니다.
+>
