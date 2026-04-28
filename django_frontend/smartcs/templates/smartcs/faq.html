@@ -11,7 +11,7 @@
                 name="question"
                 placeholder="검색어를 입력하세요"
                 data-i18n-placeholder="faq.search-placeholder"
-                value="{{ question.title }}"
+                value="{{ question.display_title }}"
             >
         </form>
     </div>
@@ -23,7 +23,7 @@
                 {% for topic in topics %}
                 <a href="{% url 'faq_browser' %}?question={{ topic.name|urlencode }}" class="topic-list-item {% if question.topic == topic.name %}active{% endif %}">
                     <span class="topic-icon" data-topic-key="{{ topic.key }}" aria-hidden="true"></span>
-                    <span>{{ topic.name }}</span>
+                    <span>{{ topic.display_name }}</span>
                 </a>
                 {% endfor %}
             </div>
@@ -32,13 +32,13 @@
         <section class="faq-main">
             <a class="faq-back-link" href="{% url 'home' %}" data-i18n="faq.back">목록으로</a>
             <article class="faq-article">
-                <h2>{{ question.title }}</h2>
+                <h2>{{ question.display_title }}</h2>
                 <span class="faq-mini-tag topic-pill">
                     <span class="topic-icon" data-topic-key="{{ question.topic_key }}" aria-hidden="true"></span>
-                    <span>{{ question.tag }}</span>
+                    <span>{{ question.display_tag }}</span>
                 </span>
                 <div class="faq-answer">
-                    <p>{{ question.content }}</p>
+                    <p>{{ question.display_content }}</p>
                 </div>
             </article>
 
@@ -49,9 +49,9 @@
                     <a class="faq-related-card topic-card" href="{% url 'faq_browser' %}?question={{ item.title|urlencode }}">
                         <div class="topic-card-head">
                             <span class="topic-icon topic-icon-lg" data-topic-key="{{ item.topic_key }}" aria-hidden="true"></span>
-                            <span>{{ item.tag }}</span>
+                            <span>{{ item.display_tag }}</span>
                         </div>
-                        <strong>{{ item.title }}</strong>
+                        <strong>{{ item.display_title }}</strong>
                     </a>
                     {% endfor %}
                 </div>

@@ -10,6 +10,7 @@ urlpatterns = [
     path("chat/", views.chat_api, name="chat_api"),
     path("chat/reset/", views.reset_chat, name="reset_chat"),
     path("device/", views.update_device, name="update_device"),
+    path("language/", views.update_language, name="update_language"),
     path("faq/", views.faq_browser, name="faq_browser"),
     path("search/", views.search, name="search"),
     path("service-centers/", views.service_centers, name="service_centers"),

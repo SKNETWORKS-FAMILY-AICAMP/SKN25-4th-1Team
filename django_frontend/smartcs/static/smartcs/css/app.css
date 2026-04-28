@@ -79,6 +79,23 @@ body.home-body .topbar-inner {
     gap: 6px;
 }
 
+.lang-toggle .search-tool-button {
+    position: relative;
+    border: 1px solid transparent;
+}
+
+.lang-toggle .search-tool-button::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: -8px;
+    height: 3px;
+    border-radius: 999px;
+    background: transparent;
+    transition: background-color 0.2s ease;
+}
+
 .brand {
     display: inline-flex;
     align-items: center;
@@ -269,6 +286,11 @@ body.home-body .content {
 .search-tool-button.active {
     background: #e8eeff;
     color: var(--brand);
+    border-color: #d7e2ff;
+}
+
+.lang-toggle .search-tool-button.active::after {
+    background: var(--brand);
 }
 
 .voice-button {

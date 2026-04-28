@@ -8,21 +8,22 @@ def generate_thread_id():
     return str(uuid.uuid4())
 
 
-def chat_with_fastapi(question, selected_device, thread_id):
+def chat_with_fastapi(question, selected_device, thread_id, selected_language="korean"):
     fastapi_url = os.getenv("FASTAPI_URL", "http://localhost:8000/api/chat")
     payload = {
         "question": question,
         "selected_device": selected_device or "선택하지 않음",
         "thread_id": thread_id,
+        "selected_language": selected_language or "korean",
     }
 
     try:
         response = requests.post(fastapi_url, json=payload, timeout=60)
         response.raise_for_status()
         data = response.json()
-        return data.get("answer") or "답변을 생성하지 못했습니다. 잠시 후 다시 시도해주세요."
+        return data.get("answer") or "답변을 생성하지 못했습니다. 잠시 후 다시 시도해 주세요."
     except requests.RequestException:
-        return "현재 챗봇 서버와 연결되지 않았습니다. FastAPI 서버 상태를 확인한 뒤 다시 시도해주세요."
+        return "현재 챗봇 서버에 연결되지 않았습니다. FastAPI 서버 상태를 확인한 뒤 다시 시도해 주세요."
 
 
 def fetch_nearest_centers(latitude, longitude):

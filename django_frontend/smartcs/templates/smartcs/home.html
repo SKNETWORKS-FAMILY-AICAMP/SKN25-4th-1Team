@@ -13,7 +13,9 @@
                 <img class="hero-logo" src="{% static 'smartcs/images/smart-cs-logo.svg' %}" alt="Smart CS logo">
             </div>
             <h1 class="home-chat-title" data-i18n="home.hero-title">무엇을 도와드릴까요?</h1>
-            <p class="home-chat-subtitle">기기 모델을 선택하고 증상을 입력하면 FAQ와 상담 답변을 한 번에 안내해드릴게요.</p>
+            <p class="home-chat-subtitle">
+                기기 모델을 선택하고 증상을 입력하시면 FAQ부터 상담 답변까지 빠르게 안내해 드릴게요.
+            </p>
         </div>
 
         <div class="home-chat-log-wrap">
@@ -34,27 +36,41 @@
                 <label for="series-select" data-i18n="home.series-label">기기 시리즈</label>
                 <select id="series-select" data-device-source>
                     <option value="" data-i18n="home.select-series">시리즈 선택</option>
-                    {% for series, models in device_data.items %}
-                    <option value="{{ series }}" data-models="{{ models|join:'||' }}">{{ series }}</option>
+                    {% for option in device_options %}
+                    <option
+                        value="{{ option.series }}"
+                        data-models="{{ option.models|join:'||' }}"
+                        data-display-name="{{ option.display_name }}"
+                        data-display-models="{{ option.display_models|join:'||' }}"
+                    >
+                        {{ option.display_name }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
 
             <div class="field-stack compact-field top-device-field">
                 <label for="device-select" data-i18n="home.model-label">기기 모델</label>
-                <select id="device-select" data-selected-device="{{ selected_device }}">
-                    <option value="{{ selected_device }}">{{ selected_device }}</option>
+                <select
+                    id="device-select"
+                    data-selected-device="{{ selected_device }}"
+                    data-selected-device-display="{{ selected_device_display }}"
+                >
+                    <option value="{{ selected_device }}">{{ selected_device_display }}</option>
                 </select>
             </div>
 
             <div class="home-chat-actions home-device-actions">
-                <button type="button" class="home-ghost-button" data-voice-input>Voice</button>
-                <button type="button" class="home-ghost-button" id="reset-chat-button">대화 초기화</button>
+                <button type="button" class="home-ghost-button" data-voice-input data-i18n-voice-button>Voice</button>
+                <button type="button" class="home-ghost-button" id="reset-chat-button" data-i18n-reset-button>
+                    대화 초기화
+                </button>
             </div>
         </div>
 
         <form class="home-composer" id="chat-form" method="post" action="{% url 'chat_api' %}">
             {% csrf_token %}
+            <input type="hidden" name="selected_language" id="selected-language" value="{{ selected_language }}">
             <input
                 type="text"
                 name="question"
@@ -64,7 +80,7 @@
                 value="{{ quick_question }}"
             >
             <div class="composer-tools">
-                <button type="submit" class="composer-send-button" aria-label="전송">전송</button>
+                <button type="submit" class="composer-send-button" aria-label="전송" data-i18n-send-button>전송</button>
             </div>
         </form>
 
@@ -77,7 +93,7 @@
                 data-quick-answer="{{ item.content|escapejs }}"
             >
                 <span class="topic-icon" data-topic-key="{{ item.topic_key }}" aria-hidden="true"></span>
-                <span>{{ item.tag }}</span>
+                <span data-home-prompt-tag data-tag-ko="{{ item.display_tag_ko }}" data-tag-en="{{ item.display_tag_en }}">{{ item.display_tag }}</span>
             </button>
             {% endfor %}
         </div>
