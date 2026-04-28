@@ -1,5 +1,9 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), '.env'))
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -66,3 +70,4 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+KAKAO_MAP_JS_KEY = "b4105b7e56aafea6407cfcd684de4944"

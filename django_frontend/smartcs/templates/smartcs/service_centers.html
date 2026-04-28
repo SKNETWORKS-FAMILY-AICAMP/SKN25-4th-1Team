@@ -1,32 +1,47 @@
 {% extends "smartcs/base.html" %}
-
+ 
 {% block content %}
 <section class="hero-card compact">
-    <div>
-        <span class="eyebrow" data-i18n="sc.eyebrow">서비스센터 안내</span>
-        <h1 data-i18n="sc.title">지도 영역과 가까운 센터 3개 결과를 함께 보여주는 화면입니다.</h1>
-        <p data-i18n="sc.desc">카카오 REST API로 목록을 조회하고, 지도 SDK 키가 있으면 마커 렌더링까지 확장할 수 있습니다.</p>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+        <div>
+            <h1 data-i18n="sc.title">내 주변 삼성 서비스센터 찾기</h1>
+        </div>
+        <!-- ✅ 내 위치 버튼 -->
+        <form method="get" id="location-form" style="flex-shrink: 0;">
+            <input type="hidden" name="lat" id="lat-input" value="{{ latitude }}">
+            <input type="hidden" name="lng" id="lng-input" value="{{ longitude }}">
+            <button id="get-location-btn" type="button"
+            style="white-space: nowrap; 
+               padding: 0.3rem 1rem;
+               background: #EFF6FF;
+               color: #2563EB;
+               border: 1.5px solid #BFDBFE;
+               border-radius:9999px;
+               font-weight: 500;
+               font-size: 0.9rem;
+               cursor: pointer;">
+    내 위치 찾기
+</button>
+        </form>
     </div>
+    <p id="location-status" style="font-size:0.85rem; color:#64748B; margin-top:0.5rem;"></p>
 </section>
-
-<section class="panel">
-    <form class="filter-form" method="get">
-        <input type="text" name="lat" value="{{ latitude }}" placeholder="위도" data-i18n-placeholder="sc.lat-placeholder">
-        <input type="text" name="lng" value="{{ longitude }}" placeholder="경도" data-i18n-placeholder="sc.lng-placeholder">
-        <button class="primary-button" type="submit" data-i18n="sc.submit">가까운 센터 조회</button>
-    </form>
-</section>
-
+ 
 <section class="map-layout">
     <div class="panel map-panel">
-        <div id="center-map" class="map-box" data-centers='[{% for center in centers %}{"name":"{{ center.name|escapejs }}","lat":"{{ center.lat }}","lng":"{{ center.lng }}"}{% if not forloop.last %},{% endif %}{% endfor %}]'>
-            <div class="map-placeholder" data-i18n="sc.map-placeholder">지도 SDK 연결 전에도 와이어프레임 확인이 가능하도록 예약된 영역입니다.</div>
+        <div id="center-map"
+             class="map-box"
+             style="width:100%; height:400px;"
+             data-lat="{{ latitude }}"
+             data-lng="{{ longitude }}"
+             data-centers='[{% for center in centers %}{"name":"{{ center.name|escapejs }}","lat":"{{ center.lat }}","lng":"{{ center.lng }}"}{% if not forloop.last %},{% endif %}{% endfor %}]'>
+            <div class="map-placeholder">지도 연동 전 미리보기 영역입니다.</div>
         </div>
     </div>
     <div class="panel">
         <div class="section-head">
-            <h2 data-i18n="sc.nearby-title">가까운 센터 3개</h2>
-            <p data-i18n="sc.nearby-desc">서비스센터 문의 분기에서 바로 연결되는 결과 리스트입니다.</p>
+            <h2 data-i18n="sc.nearby-title">가까운 센터</h2>
+            <p data-i18n="sc.nearby-desc">조회 결과를 거리순으로 보여줍니다.</p>
         </div>
         <div class="result-list">
             {% for center in centers %}
@@ -49,4 +64,82 @@
         </div>
     </div>
 </section>
+{% endblock %}
+ 
+{% block extra_scripts %}
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_js_key }}"></script>
+<script>
+// 카카오 지도 렌더링
+var mapContainer = document.getElementById('center-map');
+if (mapContainer) {
+    var placeholder = mapContainer.querySelector('.map-placeholder');
+    if (placeholder) placeholder.style.display = 'none';
+ 
+    var lat = parseFloat(mapContainer.dataset.lat) || 37.5665;
+    var lng = parseFloat(mapContainer.dataset.lng) || 126.9780;
+ 
+    var map = new kakao.maps.Map(mapContainer, {
+        center: new kakao.maps.LatLng(lat, lng),
+        level: 5
+    });
+ 
+    var centers = JSON.parse(mapContainer.dataset.centers || '[]');
+    centers.forEach(function(center) {
+        if (!center.lat || !center.lng) return;
+ 
+        var marker = new kakao.maps.Marker({
+            position: new kakao.maps.LatLng(center.lat, center.lng),
+            map: map
+        });
+ 
+        var infowindow = new kakao.maps.InfoWindow({
+            content: '<div style="padding:6px 10px;font-size:13px;font-weight:600;">' + center.name + '</div>'
+        });
+        kakao.maps.event.addListener(marker, 'click', function() {
+            infowindow.open(map, marker);
+        });
+    });
+ 
+    new kakao.maps.Marker({
+        position: new kakao.maps.LatLng(lat, lng),
+        map: map,
+        image: new kakao.maps.MarkerImage(
+            'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+            new kakao.maps.Size(24, 35)
+        )
+    });
+}
+ 
+// 내 위치 버튼
+document.getElementById('get-location-btn').addEventListener('click', function () {
+    var statusEl = document.getElementById('location-status');
+ 
+    if (!navigator.geolocation) {
+        statusEl.textContent = '이 브라우저는 위치 서비스를 지원하지 않습니다.';
+        return;
+    }
+ 
+    statusEl.textContent = '📡 현재 위치를 가져오는 중...';
+    this.disabled = true;
+ 
+    navigator.geolocation.getCurrentPosition(
+        function (position) {
+            document.getElementById('lat-input').value = position.coords.latitude;
+            document.getElementById('lng-input').value = position.coords.longitude;
+            statusEl.textContent = '✅ 위치를 찾았습니다! 조회 중...';
+            document.getElementById('location-form').submit();
+        },
+        function (error) {
+            var msg = {
+                1: '위치 접근 권한이 거부되었습니다. 브라우저 설정에서 허용해주세요.',
+                2: '위치 정보를 가져올 수 없습니다.',
+                3: '위치 요청 시간이 초과되었습니다.',
+            };
+            statusEl.textContent = msg[error.code] || '위치를 가져오지 못했습니다.';
+            document.getElementById('get-location-btn').disabled = false;
+        },
+        { timeout: 10000, enableHighAccuracy: true }
+    );
+});
+</script>
 {% endblock %}
