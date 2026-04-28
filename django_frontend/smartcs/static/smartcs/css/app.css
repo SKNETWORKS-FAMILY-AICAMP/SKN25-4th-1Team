@@ -1575,4 +1575,11 @@ textarea {
     background: linear-gradient(135deg, #3b82f6, #38bdf8);
     color: #ffffff;
     font-weight: 800;
+    margin-bottom: 16px;
+}
+
+.auth-link-text a {
+    color: #3b82f6;
+    font-weight: 800;
+    text-decoration: underline;
 }
