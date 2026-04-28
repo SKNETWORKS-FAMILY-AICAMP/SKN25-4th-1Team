@@ -3,10 +3,12 @@ const LANG_KEY = "smartcs-lang";
 const T = {
     ko: {
         "nav.faq": "FAQ",
-        "nav.service-centers": "Service Centers",
-        "nav.login": "Login",
-        "nav.signup": "Sign Up",
+        "nav.service-centers": "서비스센터",
+        "nav.login": "로그인",
+        "nav.signup": "회원가입",
         "home.hero-title": "무엇을 도와드릴까요?",
+        "home.new-chat": "+ 새 채팅",
+        "home.sidebar-title": "기기 설정",
         "home.series-label": "기기 시리즈",
         "home.select-series": "시리즈 선택",
         "home.model-label": "기기 모델",
@@ -17,47 +19,59 @@ const T = {
         "faq.back": "목록으로",
         "faq.related": "관련 질문",
         "search.eyebrow": "검색 / 필터",
-        "search.desc": "최신순, 조회순, 제목순 정렬과 카테고리 필터를 적용한 FAQ 리스트입니다.",
+        "search.desc": "최신순, 조회순, 제목순 정렬과 카테고리 필터를 적용해 FAQ를 찾아보세요.",
         "search.keyword-placeholder": "FAQ 제목 또는 내용을 검색하세요",
         "search.all-categories": "전체 카테고리",
         "search.sort-latest": "최신순",
         "search.sort-views": "조회순",
         "search.sort-title": "제목순",
         "search.submit": "검색",
-        "search.empty-title": "표시할 FAQ가 없습니다.",
-        "search.empty-desc": "현재 저장소에 FAQ CSV가 없거나 조건에 맞는 결과가 없습니다.",
-        "search.chat-link": "채팅으로 연결",
-        "sc.eyebrow": "서비스센터 안내",
-        "sc.title": "내 주변 삼성 서비스센터 찾기",
-        "sc.desc": "좌표를 입력하면 가까운 서비스센터 결과를 확인할 수 있습니다.",
+        "search.empty-title": "FAQ를 찾지 못했어요.",
+        "search.empty-desc": "현재 조건에 맞는 FAQ가 없습니다.",
+        "search.chat-link": "채팅으로 이어가기",
+        "sc.eyebrow": "서비스센터",
+        "sc.title": "현재 위치 기준으로 가까운 서비스센터를 찾아보세요.",
+        "sc.desc": "좌표를 입력하면 가까운 서비스센터를 조회할 수 있습니다.",
         "sc.lat-placeholder": "위도",
         "sc.lng-placeholder": "경도",
         "sc.submit": "가까운 센터 조회",
-        "sc.map-placeholder": "지도 연동 전 미리보기 영역입니다.",
+        "sc.map-placeholder": "지도 연동 영역",
         "sc.nearby-title": "가까운 센터",
-        "sc.nearby-desc": "조회 결과를 거리순으로 보여줍니다.",
-        "sc.empty-title": "센터 정보를 불러오지 못했습니다.",
-        "sc.empty-desc": "Kakao API 키 또는 네트워크 상태를 확인해주세요.",
+        "sc.nearby-desc": "거리순으로 정렬된 결과입니다.",
+        "sc.empty-title": "센터 정보를 불러오지 못했어요.",
+        "sc.empty-desc": "Kakao API 키 또는 네트워크 상태를 확인해 주세요.",
         "login.title": "로그인",
-        "login.subtitle": "Smart CS 기능을 사용하려면 로그인하세요.",
+        "login.subtitle": "Smart CS 기능을 사용하려면 로그인해 주세요.",
         "login.email": "이메일",
         "login.email-placeholder": "example@email.com",
         "login.password": "비밀번호",
-        "login.password-placeholder": "비밀번호를 입력하세요",
+        "login.password-placeholder": "비밀번호를 입력해 주세요",
         "login.submit": "로그인",
         "login.signup-link": "계정이 없으신가요? 회원가입",
         "signup.title": "회원가입",
-        "signup.subtitle": "Smart CS 계정을 만들고 서비스를 이용하세요.",
+        "signup.subtitle": "Smart CS 계정을 만들고 서비스를 이용해 보세요.",
         "signup.name": "이름",
-        "signup.name-placeholder": "이름을 입력하세요",
+        "signup.name-placeholder": "이름을 입력해 주세요",
         "signup.email": "이메일",
         "signup.email-placeholder": "example@email.com",
         "signup.password": "비밀번호",
-        "signup.password-placeholder": "비밀번호를 입력하세요",
+        "signup.password-placeholder": "비밀번호를 입력해 주세요",
         "signup.confirm": "비밀번호 확인",
-        "signup.confirm-placeholder": "비밀번호를 다시 입력하세요",
+        "signup.confirm-placeholder": "비밀번호를 다시 입력해 주세요",
         "signup.submit": "회원가입",
         "signup.login-link": "이미 계정이 있으신가요? 로그인",
+        "common.voice": "음성 입력",
+        "common.listening": "듣는 중...",
+        "common.reset-chat": "대화 초기화",
+        "common.send": "전송",
+        "common.voice-unsupported": "이 브라우저는 음성 인식을 지원하지 않습니다.",
+        "common.voice-start-error": "음성 인식을 시작하지 못했습니다.",
+        "common.voice-not-allowed": "마이크 권한이 거부되었습니다.",
+        "common.voice-service-not-allowed": "브라우저에서 음성 인식 서비스가 차단되었습니다.",
+        "common.voice-no-speech": "음성이 감지되지 않았습니다. 다시 시도해 주세요.",
+        "common.voice-audio-capture": "사용 가능한 마이크를 찾지 못했습니다.",
+        "common.voice-network": "음성 인식 중 네트워크 오류가 발생했습니다.",
+        "common.voice-fallback-error": "음성 입력을 가져오지 못했습니다. 다시 시도해 주세요.",
     },
     en: {
         "nav.faq": "FAQ",
@@ -65,6 +79,8 @@ const T = {
         "nav.login": "Login",
         "nav.signup": "Sign Up",
         "home.hero-title": "How can we help you?",
+        "home.new-chat": "+ New Chat",
+        "home.sidebar-title": "Device Settings",
         "home.series-label": "Device Series",
         "home.select-series": "Select series",
         "home.model-label": "Device Model",
@@ -75,7 +91,7 @@ const T = {
         "faq.back": "Back to list",
         "faq.related": "Related Questions",
         "search.eyebrow": "Search / Filter",
-        "search.desc": "FAQ list with sorting by latest, views, and title, plus category filter.",
+        "search.desc": "Browse FAQs with sorting by latest, views, and title, plus category filtering.",
         "search.keyword-placeholder": "Search FAQ title or content",
         "search.all-categories": "All Categories",
         "search.sort-latest": "Latest",
@@ -83,10 +99,10 @@ const T = {
         "search.sort-title": "By Title",
         "search.submit": "Search",
         "search.empty-title": "No FAQ found.",
-        "search.empty-desc": "No FAQ CSV in the repository, or no results match the criteria.",
-        "search.chat-link": "Chat about this",
+        "search.empty-desc": "No FAQ matches the current filters.",
+        "search.chat-link": "Continue in chat",
         "sc.eyebrow": "Service Centers",
-        "sc.title": "Find nearby Samsung service centers.",
+        "sc.title": "Find nearby service centers from your current location.",
         "sc.desc": "Enter coordinates to check the nearest service centers.",
         "sc.lat-placeholder": "Latitude",
         "sc.lng-placeholder": "Longitude",
@@ -116,11 +132,38 @@ const T = {
         "signup.confirm-placeholder": "Enter your password again",
         "signup.submit": "Sign Up",
         "signup.login-link": "Already have an account? Login",
+        "common.voice": "Voice",
+        "common.listening": "Listening...",
+        "common.reset-chat": "Reset Chat",
+        "common.send": "Send",
+        "common.voice-unsupported": "This browser does not support speech recognition.",
+        "common.voice-start-error": "Could not start speech recognition.",
+        "common.voice-not-allowed": "Microphone permission was denied.",
+        "common.voice-service-not-allowed": "Speech service is blocked in this browser.",
+        "common.voice-no-speech": "No speech was detected. Please try again.",
+        "common.voice-audio-capture": "No microphone was found.",
+        "common.voice-network": "Speech recognition network error occurred.",
+        "common.voice-fallback-error": "Could not get voice input. Please try again.",
     },
 };
 
+function getCurrentLang() {
+    return localStorage.getItem(LANG_KEY) || "ko";
+}
+
+function getBackendLanguage(lang = getCurrentLang()) {
+    return lang === "en" ? "english" : "korean";
+}
+
+function translate(key, lang = getCurrentLang()) {
+    const table = T[lang] || T.ko;
+    return table[key] ?? key;
+}
+
 function applyTranslations(lang) {
     const t = T[lang] || T.ko;
+
+    document.documentElement.lang = lang === "en" ? "en" : "ko";
 
     document.querySelectorAll("[data-i18n]").forEach((el) => {
         const val = t[el.dataset.i18n];
@@ -140,22 +183,88 @@ function applyTranslations(lang) {
         const count = el.dataset.resultCount;
         el.textContent = lang === "en" ? `${count} result(s)` : `검색 결과 ${count}건`;
     });
+
+    const voiceButtons = document.querySelectorAll("[data-i18n-voice-button]");
+    voiceButtons.forEach((button) => {
+        if (!button.classList.contains("is-listening")) {
+            button.textContent = translate("common.voice", lang);
+        }
+    });
+
+    const resetButton = document.querySelector("[data-i18n-reset-button]");
+    if (resetButton) {
+        resetButton.textContent = translate("common.reset-chat", lang);
+    }
+
+    const sendButton = document.querySelector("[data-i18n-send-button]");
+    if (sendButton) {
+        sendButton.textContent = translate("common.send", lang);
+    }
+
+    const selectedLanguageInput = document.querySelector("#selected-language");
+    if (selectedLanguageInput) {
+        selectedLanguageInput.value = getBackendLanguage(lang);
+    }
+
+    document.querySelectorAll("[data-home-prompt-tag]").forEach((el) => {
+        const nextText = lang === "en" ? el.dataset.tagEn : el.dataset.tagKo;
+        if (nextText) {
+            el.textContent = nextText;
+        }
+    });
+
+    document.querySelectorAll("[data-device-source] option").forEach((option) => {
+        if (!option.value) {
+            return;
+        }
+        const nextText = lang === "en" ? option.dataset.displayNameEn : option.dataset.displayNameKo;
+        if (nextText) {
+            option.textContent = nextText;
+        }
+    });
 }
 
-function setLanguage(lang) {
+function setLanguage(lang, options = {}) {
+    const { syncServer = true, reloadDynamicPages = false } = options;
     localStorage.setItem(LANG_KEY, lang);
     applyTranslations(lang);
     document.querySelectorAll("[data-language-toggle]").forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.languageToggle === lang);
     });
+
+    if (!syncServer) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("selected_language", getBackendLanguage(lang));
+    postForm("/language/", formData)
+        .then(() => {
+            const currentPath = window.location.pathname;
+            if (reloadDynamicPages && (currentPath.startsWith("/faq/") || currentPath.startsWith("/search/"))) {
+                window.location.reload();
+            }
+        })
+        .catch(() => null);
 }
 
-function getCurrentLang() {
-    return localStorage.getItem(LANG_KEY) || "ko";
+function getCookie(name) {
+    const cookies = document.cookie ? document.cookie.split(";") : [];
+    for (const cookie of cookies) {
+        const trimmed = cookie.trim();
+        if (trimmed.startsWith(`${name}=`)) {
+            return decodeURIComponent(trimmed.slice(name.length + 1));
+        }
+    }
+    return "";
 }
 
 function postForm(url, formData) {
-    const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]")?.value || "";
+    const csrfToken =
+        document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
+        document.querySelector("[name=csrfmiddlewaretoken]")?.value ||
+        getCookie("csrftoken") ||
+        "";
     return fetch(url, {
         method: "POST",
         headers: {
@@ -202,6 +311,12 @@ function initDeviceSelection() {
     }
 
     const selectedDevice = deviceSelect.dataset.selectedDevice || "선택하지 않음";
+    const selectedDeviceDisplay =
+        (getCurrentLang() === "en"
+            ? deviceSelect.dataset.selectedDeviceDisplayEn
+            : deviceSelect.dataset.selectedDeviceDisplayKo) ||
+        deviceSelect.dataset.selectedDeviceDisplay ||
+        selectedDevice;
 
     function getModelsFromOption(option) {
         if (!option || !option.dataset.models) {
@@ -213,13 +328,27 @@ function initDeviceSelection() {
             .filter(Boolean);
     }
 
-    function renderDeviceOptions(models, preferredModel = "") {
+    function getDisplayModelsFromOption(option) {
+        if (!option) {
+            return [];
+        }
+        const displayModels = getCurrentLang() === "en" ? option.dataset.displayModelsEn : option.dataset.displayModelsKo;
+        if (!displayModels) {
+            return [];
+        }
+        return displayModels
+            .split("||")
+            .map((model) => model.trim())
+            .filter(Boolean);
+    }
+
+    function renderDeviceOptions(models, displayModels, preferredModel = "") {
         deviceSelect.innerHTML = "";
 
         if (!models.length) {
             const emptyOption = document.createElement("option");
             emptyOption.value = "선택하지 않음";
-            emptyOption.textContent = "선택하지 않음";
+            emptyOption.textContent = getCurrentLang() === "en" ? "Not selected" : "선택하지 않음";
             deviceSelect.appendChild(emptyOption);
             return;
         }
@@ -227,7 +356,7 @@ function initDeviceSelection() {
         models.forEach((model, index) => {
             const nextOption = document.createElement("option");
             nextOption.value = model;
-            nextOption.textContent = model;
+            nextOption.textContent = displayModels[index] || model;
             if ((preferredModel && model === preferredModel) || (!preferredModel && index === 0)) {
                 nextOption.selected = true;
             }
@@ -238,7 +367,8 @@ function initDeviceSelection() {
     function syncModelsForSelectedSeries(preferredModel = "") {
         const option = seriesSelect.options[seriesSelect.selectedIndex];
         const models = getModelsFromOption(option);
-        renderDeviceOptions(models, preferredModel);
+        const displayModels = getDisplayModelsFromOption(option);
+        renderDeviceOptions(models, displayModels, preferredModel);
     }
 
     const seriesOptions = Array.from(seriesSelect.options).slice(1);
@@ -248,7 +378,11 @@ function initDeviceSelection() {
         seriesSelect.value = matchedSeriesOption.value;
         syncModelsForSelectedSeries(selectedDevice);
     } else {
-        renderDeviceOptions([], "");
+        deviceSelect.innerHTML = "";
+        const emptyOption = document.createElement("option");
+        emptyOption.value = selectedDevice;
+        emptyOption.textContent = selectedDeviceDisplay;
+        deviceSelect.appendChild(emptyOption);
     }
 
     seriesSelect.addEventListener("change", () => {
@@ -268,6 +402,7 @@ function initChat() {
     const quickButtons = document.querySelectorAll("[data-quick-question]");
     const questionInput = document.querySelector("#chat-question");
     const resetButton = document.querySelector("#reset-chat-button");
+    const selectedLanguageInput = document.querySelector("#selected-language");
 
     if (!form || !chatLog || !questionInput) {
         return;
@@ -283,7 +418,7 @@ function initChat() {
         chatLog.appendChild(renderChatMessage("user", normalizedQuestion));
         syncHomeChatState();
 
-        if (answerOverride) {
+        if (answerOverride && getCurrentLang() !== "en") {
             chatLog.appendChild(renderChatMessage("assistant", answerOverride));
             syncHomeChatState();
             chatLog.scrollTop = chatLog.scrollHeight;
@@ -291,18 +426,22 @@ function initChat() {
 
         const formData = new FormData(form);
         formData.set("question", normalizedQuestion);
-        formData.set("answer_override", answerOverride);
+        formData.set("answer_override", getCurrentLang() === "en" ? "" : answerOverride);
+        formData.set("selected_language", getBackendLanguage());
+        if (selectedLanguageInput) {
+            selectedLanguageInput.value = getBackendLanguage();
+        }
 
         try {
             const payload = await postForm(form.action, formData);
-            if (!answerOverride) {
-                const answer = payload?.answer || "답변을 가져오지 못했습니다. 다시 시도해주세요.";
+            if (!answerOverride || getCurrentLang() === "en") {
+                const answer = payload?.answer || "답변을 가져오지 못했습니다. 다시 시도해 주세요.";
                 chatLog.appendChild(renderChatMessage("assistant", answer));
                 syncHomeChatState();
                 chatLog.scrollTop = chatLog.scrollHeight;
             }
         } catch (error) {
-            if (!answerOverride) {
+            if (!answerOverride || getCurrentLang() === "en") {
                 chatLog.appendChild(renderChatMessage("assistant", "요청 처리 중 오류가 발생했습니다."));
                 syncHomeChatState();
                 chatLog.scrollTop = chatLog.scrollHeight;
@@ -332,19 +471,42 @@ function initChat() {
     syncHomeChatState();
 }
 
+function initHomeResetLink() {
+    const homeLink = document.querySelector("[data-home-reset-link]");
+    if (!homeLink) {
+        return;
+    }
+
+    homeLink.addEventListener("click", async (event) => {
+        event.preventDefault();
+        const formData = new FormData();
+        try {
+            await postForm("/chat/reset/", formData);
+        } catch (error) {
+            // Even if reset fails, still move the user home.
+        }
+        window.location.href = homeLink.href;
+    });
+}
+
 function initLandingTools() {
     const langButtons = document.querySelectorAll("[data-language-toggle]");
     const voiceButtons = document.querySelectorAll("[data-voice-input]");
 
     langButtons.forEach((button) => {
-        button.addEventListener("click", () => setLanguage(button.dataset.languageToggle));
+        button.addEventListener("click", () =>
+            setLanguage(button.dataset.languageToggle, {
+                syncServer: true,
+                reloadDynamicPages: true,
+            })
+        );
     });
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
         voiceButtons.forEach((voiceButton) => {
             voiceButton.disabled = true;
-            voiceButton.title = "This browser does not support speech recognition.";
+            voiceButton.title = translate("common.voice-unsupported");
         });
         return;
     }
@@ -365,15 +527,16 @@ function initLandingTools() {
         nextRecognition.lang = getCurrentLang() === "en" ? "en-US" : "ko-KR";
         nextRecognition.interimResults = false;
         nextRecognition.maxAlternatives = 1;
+        nextRecognition.continuous = false;
 
         nextRecognition.onstart = () => {
             isListening = true;
-            syncVoiceButtons(getCurrentLang() === "en" ? "Listening..." : "듣는 중...");
+            syncVoiceButtons(translate("common.listening"));
         };
 
         nextRecognition.onend = () => {
             isListening = false;
-            syncVoiceButtons("Voice");
+            syncVoiceButtons(translate("common.voice"));
         };
 
         nextRecognition.onresult = (event) => {
@@ -383,25 +546,25 @@ function initLandingTools() {
                 input.value = transcript;
                 input.focus();
             }
+            nextRecognition.stop();
         };
 
         nextRecognition.onerror = (event) => {
-            const lang = getCurrentLang();
             const errorCode = event?.error || "unknown";
-            const messages = {
-                "not-allowed": lang === "en" ? "Microphone permission was denied." : "마이크 권한이 거부되었습니다.",
-                "service-not-allowed": lang === "en" ? "Speech service is blocked in this browser." : "브라우저에서 음성 인식 서비스 사용이 차단되었습니다.",
-                "no-speech": lang === "en" ? "No speech was detected. Please try again." : "음성이 감지되지 않았습니다. 다시 시도해주세요.",
-                "audio-capture": lang === "en" ? "No microphone was found." : "사용 가능한 마이크를 찾지 못했습니다.",
-                "network": lang === "en" ? "Speech recognition network error occurred." : "음성 인식 네트워크 오류가 발생했습니다.",
+            const errorMap = {
+                "not-allowed": "common.voice-not-allowed",
+                "service-not-allowed": "common.voice-service-not-allowed",
+                "no-speech": "common.voice-no-speech",
+                "audio-capture": "common.voice-audio-capture",
+                "network": "common.voice-network",
             };
-            window.alert(messages[errorCode] || (lang === "en" ? "Could not get voice input. Please try again." : "음성 입력을 가져오지 못했습니다. 다시 시도해주세요."));
+            window.alert(translate(errorMap[errorCode] || "common.voice-fallback-error"));
         };
 
         return nextRecognition;
     }
 
-    syncVoiceButtons("Voice");
+    syncVoiceButtons(translate("common.voice"));
 
     voiceButtons.forEach((voiceButton) => {
         voiceButton.addEventListener("click", () => {
@@ -415,8 +578,8 @@ function initLandingTools() {
                 recognition.start();
             } catch (error) {
                 isListening = false;
-                syncVoiceButtons("Voice");
-                window.alert(getCurrentLang() === "en" ? "Could not start speech recognition." : "음성 인식을 시작하지 못했습니다.");
+                syncVoiceButtons(translate("common.voice"));
+                window.alert(translate("common.voice-start-error"));
             }
         });
     });
@@ -425,6 +588,10 @@ function initLandingTools() {
 document.addEventListener("DOMContentLoaded", () => {
     initDeviceSelection();
     initChat();
+    initHomeResetLink();
     initLandingTools();
-    setLanguage(getCurrentLang());
+    setLanguage(getCurrentLang(), {
+        syncServer: false,
+        reloadDynamicPages: false,
+    });
 });
