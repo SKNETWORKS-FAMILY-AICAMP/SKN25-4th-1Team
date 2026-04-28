@@ -20,11 +20,11 @@
                         <button type="button" class="search-tool-button" data-language-toggle="en">English</button>
                     </div>
                 </div>
-                <nav class="topnav">
+                <nav class="topnav">                   
                     <a href="{% url 'faq_browser' %}" class="{% if request.path == '/faq/' %}active{% endif %}" data-i18n="nav.faq">FAQ</a>
                     <a href="{% url 'service_centers' %}" class="{% if request.path == '/service-centers/' %}active{% endif %}" data-i18n="nav.service-centers">Service Centers</a>
-                    <a href="{% url 'login' %}" class="{% if request.path == '/login/' %}active{% endif %}" data-i18n="nav.login">Login</a>
-                    <a href="{% url 'signup' %}" class="{% if request.path == '/signup/' %}active{% endif %}" data-i18n="nav.signup">Sign Up</a>
+                    <a href="{% url 'accounts:login' %}" class="{% if request.path == '/accounts/login/' %}active{% endif %}" data-i18n="nav.login">Login</a>
+                    <a href="{% url 'accounts:signup' %}" class="{% if request.path == '/accounts/signup/' %}active{% endif %}" data-i18n="nav.signup">Sign Up</a>
                 </nav>
             </div>
         </header>
