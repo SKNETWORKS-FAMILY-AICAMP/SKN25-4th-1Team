@@ -4,34 +4,21 @@
 {% block body_class %}home-body{% endblock %}
 
 {% block content %}
-<section class="home-chat-shell {% if messages|length <= 1 %}is-pristine{% else %}has-history{% endif %}">
-    <div class="home-chat-topbar"></div>
-
-    <div class="home-chat-stage">
-        <div class="home-chat-intro">
-            <div class="hero-logo-wrap home-chat-logo">
-                <img class="hero-logo" src="{% static 'smartcs/images/smart-cs-logo.svg' %}" alt="Smart CS logo">
-            </div>
-            <h1 class="home-chat-title" data-i18n="home.hero-title">무엇을 도와드릴까요?</h1>
-            <p class="home-chat-subtitle">
-                기기 모델을 선택하고 증상을 입력하시면 FAQ부터 상담 답변까지 빠르게 안내해 드릴게요.
-            </p>
+<section class="home-layout">
+    <aside class="home-sidebar">
+        <div class="home-sidebar-section">
+            <button type="button" class="home-sidebar-reset" id="reset-chat-button" data-i18n="home.new-chat">
+                + 새 채팅
+            </button>
         </div>
 
-        <div class="home-chat-log-wrap">
-            <div class="chat-log home-chat-log" id="chat-log">
-                {% for message in messages %}
-                <article class="message {{ message.role }}">
-                    <span class="role">{{ message.role }}</span>
-                    <p>{{ message.content }}</p>
-                </article>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+        <div class="home-sidebar-divider"></div>
 
-    <div class="home-composer-dock">
-        <div class="home-device-strip">
+        <div class="home-sidebar-section">
+            <div class="home-sidebar-heading">
+                <h2 class="home-sidebar-title" data-i18n="home.sidebar-title">기기 설정</h2>
+            </div>
+
             <div class="field-stack compact-field top-device-field">
                 <label for="series-select" data-i18n="home.series-label">기기 시리즈</label>
                 <select id="series-select" data-device-source>
@@ -41,7 +28,11 @@
                         value="{{ option.series }}"
                         data-models="{{ option.models|join:'||' }}"
                         data-display-name="{{ option.display_name }}"
+                        data-display-name-ko="{{ option.display_name_ko }}"
+                        data-display-name-en="{{ option.display_name_en }}"
                         data-display-models="{{ option.display_models|join:'||' }}"
+                        data-display-models-ko="{{ option.display_models_ko|join:'||' }}"
+                        data-display-models-en="{{ option.display_models_en|join:'||' }}"
                     >
                         {{ option.display_name }}
                     </option>
@@ -55,48 +46,71 @@
                     id="device-select"
                     data-selected-device="{{ selected_device }}"
                     data-selected-device-display="{{ selected_device_display }}"
+                    data-selected-device-display-ko="{{ selected_device_display_ko }}"
+                    data-selected-device-display-en="{{ selected_device_display_en }}"
                 >
                     <option value="{{ selected_device }}">{{ selected_device_display }}</option>
                 </select>
             </div>
+        </div>
+    </aside>
 
-            <div class="home-chat-actions home-device-actions">
-                <button type="button" class="home-ghost-button" data-voice-input data-i18n-voice-button>Voice</button>
-                <button type="button" class="home-ghost-button" id="reset-chat-button" data-i18n-reset-button>
-                    대화 초기화
+    <section class="home-chat-shell {% if messages|length <= 1 %}is-pristine{% else %}has-history{% endif %}">
+        <div class="home-chat-topbar"></div>
+
+        <div class="home-chat-stage">
+            <div class="home-chat-intro">
+                <div class="hero-logo-wrap home-chat-logo">
+                    <img class="hero-logo" src="{% static 'smartcs/images/smart-cs-logo.svg' %}" alt="Smart CS logo">
+                </div>
+                <h1 class="home-chat-title" data-i18n="home.hero-title">무엇을 도와드릴까요?</h1>
+                <p class="home-chat-subtitle">
+                    기기 모델을 선택하고 증상을 입력하면 FAQ와 상담 답변을 한 번에 안내해드릴게요.
+                </p>
+            </div>
+
+            <div class="chat-log home-chat-log" id="chat-log">
+                {% for message in messages %}
+                <article class="message {{ message.role }}">
+                    <span class="role">{{ message.role }}</span>
+                    <p>{{ message.content }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="home-composer-dock">
+            <form class="home-composer" id="chat-form" method="post" action="{% url 'chat_api' %}">
+                {% csrf_token %}
+                <input type="hidden" name="selected_language" id="selected-language" value="{{ selected_language }}">
+                <input
+                    type="text"
+                    name="question"
+                    id="chat-question"
+                    placeholder="무엇이든 물어보세요"
+                    data-i18n-placeholder="home.search-placeholder"
+                    value="{{ quick_question }}"
+                >
+                <div class="composer-tools">
+                    <button type="button" class="home-ghost-button home-mic-button" data-voice-input aria-label="Voice input"></button>
+                    <button type="submit" class="composer-send-button" aria-label="전송" data-i18n-send-button>전송</button>
+                </div>
+            </form>
+
+            <div class="home-prompt-row">
+                {% for item in popular_questions %}
+                <button
+                    type="button"
+                    class="home-prompt-chip"
+                    data-quick-question="{{ item.title }}"
+                    data-quick-answer="{{ item.content|escapejs }}"
+                >
+                    <span class="topic-icon" data-topic-key="{{ item.topic_key }}" aria-hidden="true"></span>
+                    <span data-home-prompt-tag data-tag-ko="{{ item.display_tag_ko }}" data-tag-en="{{ item.display_tag_en }}">{{ item.display_tag }}</span>
                 </button>
+                {% endfor %}
             </div>
         </div>
-
-        <form class="home-composer" id="chat-form" method="post" action="{% url 'chat_api' %}">
-            {% csrf_token %}
-            <input type="hidden" name="selected_language" id="selected-language" value="{{ selected_language }}">
-            <input
-                type="text"
-                name="question"
-                id="chat-question"
-                placeholder="무엇이든 물어보세요"
-                data-i18n-placeholder="home.search-placeholder"
-                value="{{ quick_question }}"
-            >
-            <div class="composer-tools">
-                <button type="submit" class="composer-send-button" aria-label="전송" data-i18n-send-button>전송</button>
-            </div>
-        </form>
-
-        <div class="home-prompt-row">
-            {% for item in popular_questions %}
-            <button
-                type="button"
-                class="home-prompt-chip"
-                data-quick-question="{{ item.title }}"
-                data-quick-answer="{{ item.content|escapejs }}"
-            >
-                <span class="topic-icon" data-topic-key="{{ item.topic_key }}" aria-hidden="true"></span>
-                <span data-home-prompt-tag data-tag-ko="{{ item.display_tag_ko }}" data-tag-en="{{ item.display_tag_en }}">{{ item.display_tag }}</span>
-            </button>
-            {% endfor %}
-        </div>
-    </div>
+    </section>
 </section>
 {% endblock %}

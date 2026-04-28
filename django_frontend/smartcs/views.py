@@ -109,8 +109,12 @@ def home(request):
         {
             "series": series,
             "display_name": _translate_home_static_label(series, use_english),
+            "display_name_ko": series,
+            "display_name_en": _translate_home_static_label(series, True),
             "models": models,
             "display_models": [_translate_home_static_label(model, use_english) for model in models],
+            "display_models_ko": models,
+            "display_models_en": [_translate_home_static_label(model, True) for model in models],
         }
         for series, models in raw_device_data.items()
     ]
@@ -129,6 +133,8 @@ def home(request):
         "device_options": device_options,
         "selected_device": selected_device,
         "selected_device_display": _translate_home_static_label(selected_device, use_english),
+        "selected_device_display_ko": selected_device,
+        "selected_device_display_en": _translate_home_static_label(selected_device, True),
         "selected_language": selected_language,
         "popular_questions": popular_questions,
         "quick_question": request.GET.get("quick", ""),

@@ -7,6 +7,8 @@ const T = {
         "nav.login": "로그인",
         "nav.signup": "회원가입",
         "home.hero-title": "무엇을 도와드릴까요?",
+        "home.new-chat": "+ 새 채팅",
+        "home.sidebar-title": "기기 설정",
         "home.series-label": "기기 시리즈",
         "home.select-series": "시리즈 선택",
         "home.model-label": "기기 모델",
@@ -77,6 +79,8 @@ const T = {
         "nav.login": "Login",
         "nav.signup": "Sign Up",
         "home.hero-title": "How can we help you?",
+        "home.new-chat": "+ New Chat",
+        "home.sidebar-title": "Device Settings",
         "home.series-label": "Device Series",
         "home.select-series": "Select series",
         "home.model-label": "Device Model",
@@ -208,6 +212,16 @@ function applyTranslations(lang) {
             el.textContent = nextText;
         }
     });
+
+    document.querySelectorAll("[data-device-source] option").forEach((option) => {
+        if (!option.value) {
+            return;
+        }
+        const nextText = lang === "en" ? option.dataset.displayNameEn : option.dataset.displayNameKo;
+        if (nextText) {
+            option.textContent = nextText;
+        }
+    });
 }
 
 function setLanguage(lang, options = {}) {
@@ -297,7 +311,12 @@ function initDeviceSelection() {
     }
 
     const selectedDevice = deviceSelect.dataset.selectedDevice || "선택하지 않음";
-    const selectedDeviceDisplay = deviceSelect.dataset.selectedDeviceDisplay || selectedDevice;
+    const selectedDeviceDisplay =
+        (getCurrentLang() === "en"
+            ? deviceSelect.dataset.selectedDeviceDisplayEn
+            : deviceSelect.dataset.selectedDeviceDisplayKo) ||
+        deviceSelect.dataset.selectedDeviceDisplay ||
+        selectedDevice;
 
     function getModelsFromOption(option) {
         if (!option || !option.dataset.models) {
@@ -310,10 +329,14 @@ function initDeviceSelection() {
     }
 
     function getDisplayModelsFromOption(option) {
-        if (!option || !option.dataset.displayModels) {
+        if (!option) {
             return [];
         }
-        return option.dataset.displayModels
+        const displayModels = getCurrentLang() === "en" ? option.dataset.displayModelsEn : option.dataset.displayModelsKo;
+        if (!displayModels) {
+            return [];
+        }
+        return displayModels
             .split("||")
             .map((model) => model.trim())
             .filter(Boolean);
