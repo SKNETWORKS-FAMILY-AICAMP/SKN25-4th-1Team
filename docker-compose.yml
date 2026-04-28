@@ -1,23 +1,54 @@
 services:
-  web:
+  fastapi:
     build:
       context: .
       dockerfile: Dockerfile
-    command: python frontend/manage.py runserver 0.0.0.0:8000
+    command: python -m uvicorn entrypoint.main:app --reload --host 0.0.0.0 --port 8000
     env_file:
       - .env
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       MONGO_URI: mongodb://mongo:27017/
-      DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost,0.0.0.0
     depends_on:
       - redis
       - mongo
-    ports:
-      - "8000:8000"
     volumes:
+      - .:/app
       - ./data:/app/data
+    restart: unless-stopped
+
+  django:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python django_frontend/manage.py runserver 0.0.0.0:8010
+    env_file:
+      - .env
+    environment:
+      FASTAPI_URL: http://fastapi:8000/api/chat
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MONGO_URI: mongodb://mongo:27017/
+      DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost,0.0.0.0,django,nginx
+    depends_on:
+      - fastapi
+      - redis
+      - mongo
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    depends_on:
+      - django
+      - fastapi
+    ports:
+      - "8010:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     restart: unless-stopped
 
   celery:
@@ -35,6 +66,7 @@ services:
       - redis
       - mongo
     volumes:
+      - .:/app
       - ./data:/app/data
     restart: unless-stopped
 
