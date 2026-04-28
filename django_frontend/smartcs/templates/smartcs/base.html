@@ -11,6 +11,8 @@
     <div class="site-shell">
         <header class="topbar">
             <div class="topbar-inner">
+
+                <!-- 로고 + 언어 -->
                 <div class="brand-group">
                     <a class="brand" href="{% url 'home' %}">
                         <img class="brand-logo" src="{% static 'smartcs/images/smart-cs-logo.svg' %}" alt="Smart CS 로고">
@@ -20,18 +22,39 @@
                         <button type="button" class="search-tool-button" data-language-toggle="en">English</button>
                     </div>
                 </div>
-                <nav class="topnav">                   
-                    <a href="{% url 'faq_browser' %}" class="{% if request.path == '/faq/' %}active{% endif %}" data-i18n="nav.faq">FAQ</a>
-                    <a href="{% url 'service_centers' %}" class="{% if request.path == '/service-centers/' %}active{% endif %}" data-i18n="nav.service-centers">Service Centers</a>
-                    <a href="{% url 'accounts:login' %}" class="{% if request.path == '/accounts/login/' %}active{% endif %}" data-i18n="nav.login">Login</a>
-                    <a href="{% url 'accounts:signup' %}" class="{% if request.path == '/accounts/signup/' %}active{% endif %}" data-i18n="nav.signup">Sign Up</a>
+
+                
+                <nav class="topnav">
+                    <a href="{% url 'faq_browser' %}" 
+                       class="{% if request.path == '/faq/' %}active{% endif %}" 
+                       data-i18n="nav.faq">FAQ</a>
+
+                    <a href="{% url 'service_centers' %}" 
+                       class="{% if request.path == '/service-centers/' %}active{% endif %}" 
+                       data-i18n="nav.service-centers">Service Centers</a>
+
+                    {% if request.user.is_authenticated %}
+                        <span>{{ request.user.username }}님</span>
+                        <a href="{% url 'accounts:logout' %}">Logout</a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" 
+                           class="{% if request.path == '/accounts/login/' %}active{% endif %}" 
+                           data-i18n="nav.login">Login</a>
+
+                        <a href="{% url 'accounts:signup' %}" 
+                           class="{% if request.path == '/accounts/signup/' %}active{% endif %}" 
+                           data-i18n="nav.signup">Sign Up</a>
+                    {% endif %}
                 </nav>
+
             </div>
         </header>
+
         <main class="content content-wide">
             {% block content %}{% endblock %}
         </main>
     </div>
+
     <script src="{% static 'smartcs/js/app.js' %}"></script>
 </body>
 </html>
