@@ -354,7 +354,7 @@ function initLandingTools() {
 
     function syncVoiceButtons(label) {
         voiceButtons.forEach((voiceButton) => {
-            voiceButton.textContent = label;
+            voiceButton.querySelector("svg") ? voiceButton.setAttribute("title", label) : voiceButton.textContent = label;
             voiceButton.classList.toggle("is-listening", isListening);
             voiceButton.setAttribute("aria-pressed", isListening ? "true" : "false");
         });
@@ -373,7 +373,7 @@ function initLandingTools() {
 
         nextRecognition.onend = () => {
             isListening = false;
-            syncVoiceButtons("Voice");
+            // syncVoiceButtons("Voice");
         };
 
         nextRecognition.onresult = (event) => {
@@ -401,7 +401,7 @@ function initLandingTools() {
         return nextRecognition;
     }
 
-    syncVoiceButtons("Voice");
+    // syncVoiceButtons("Voice");
 
     voiceButtons.forEach((voiceButton) => {
         voiceButton.addEventListener("click", () => {
@@ -415,7 +415,7 @@ function initLandingTools() {
                 recognition.start();
             } catch (error) {
                 isListening = false;
-                syncVoiceButtons("Voice");
+                // syncVoiceButtons("Voice");
                 window.alert(getCurrentLang() === "en" ? "Could not start speech recognition." : "음성 인식을 시작하지 못했습니다.");
             }
         });
