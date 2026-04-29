@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>시스템 아키텍처</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 30px;
+  }
+  .slide {
+    width: 960px;
+    background: white;
+    padding: 40px 50px 50px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  .title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+  }
+  .title-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .title-num {
+    font-size: 48px;
+    font-style: italic;
+    color: #bbb;
+    font-weight: 300;
+  }
+  .title-text {
+    font-size: 32px;
+    font-weight: 800;
+    color: #111;
+  }
+  .docker-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 2px solid #2496ED;
+    border-radius: 8px;
+    color: #2496ED;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .docker-badge img { width: 32px; }
+
+  /* Main container */
+  .main-box {
+    border: 2px solid #aaa;
+    border-radius: 16px;
+    padding: 24px 28px 28px;
+    position: relative;
+  }
+
+  /* Top row: user → django+fastapi → langgraph → answer */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 24px;
+  }
+  .node {
+    background: white;
+    border: 2px solid #555;
+    border-radius: 10px;
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .arrow {
+    font-size: 28px;
+    color: #555;
+    margin: 0 8px;
+    font-weight: 300;
+  }
+  .flex1 { flex: 1; }
+
+  /* Middle box: FastAPI + LangGraph */
+  .middle-box {
+    flex: 1;
+    border: 2px solid #555;
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: white;
+  }
+  .middle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #333;
+  }
+
+  /* Logo badges */
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .logo-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .badge-fastapi { background: #009688; color: white; }
+  .badge-langgraph { background: #1a1a2e; color: #a855f7; }
+  .badge-openai { background: #10a37f; color: white; }
+  .badge-chroma { background: #f97316; color: white; }
+  .badge-bm25 { background: #6366f1; color: white; }
+  .badge-kakao { background: #FEE500; color: #333; }
+
+  /* LangGraph inner nodes */
+  .lg-nodes {
+    border: 1.5px dashed #999;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 6px;
+    background: #fafafa;
+  }
+  .lg-node-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #444;
+    padding: 3px 0;
+  }
+  .lg-node-row + .lg-node-row {
+    border-top: 1px solid #eee;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-green { background: #10a37f; }
+  .dot-orange { background: #f97316; }
+  .dot-yellow { background: #eab308; }
+
+  /* Bottom row: Redis → Celery → MongoDB */
+  .bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 6px;
+  }
+  .infra-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    border: 2px solid;
+  }
+  .badge-redis { border-color: #DC382D; color: #DC382D; }
+  .badge-celery { border-color: #37814A; color: #37814A; }
+  .badge-mongo { border-color: #13AA52; color: #13AA52; }
+  .infra-label {
+    font-size: 11px;
+    color: #888;
+    font-weight: 400;
+  }
+  .infra-arrow {
+    font-size: 20px;
+    color: #888;
+  }
+
+  /* Django label */
+  .django-label {
+    font-size: 11px;
+    color: #888;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .section-divider {
+    border: none;
+    border-top: 1px dashed #ddd;
+    margin: 14px 0;
+  }
+</style>
+</head>
+<body>
+<div class="slide">
+  <!-- Title -->
+  <div class="title-row">
+    <div class="title-left">
+      <span class="title-num">03</span>
+      <span class="title-text">시스템 아키텍처</span>
+    </div>
+    <div class="docker-badge">
+      <svg width="32" height="22" viewBox="0 0 219 153" fill="#2496ED" xmlns="http://www.w3.org/2000/svg">
+        <path d="M210.6 88.9c-3.8-2.6-12.5-3.5-19.2-2.2-0.8-6.7-4.5-12.5-10.9-17.7l-3.7-2.5-2.5 3.7c-3.2 4.8-4.7 11.4-4.2 17.7 0.2 2.1 0.9 5.9 3.1 9.2-2.2 1.2-6.5 2.9-12.2 2.8H6.7c-1.5 0-2.7 1.2-2.8 2.7-0.3 7.3 0.7 14.5 3.3 21.5 2.9 7.5 7.2 13 13 16.3 6.5 3.7 17.1 5.8 29.2 5.8 5.5 0 11-0.5 16.4-1.5 7.5-1.4 14.7-4 21.1-7.7 5.4-3.1 10.2-7.1 14.4-11.8 6.7-7.6 10.7-16 13.6-23.5h1.2c7.4 0 14.6-1.6 19.9-5.5 2.7-1.9 6.2-5.5 8-10.5l0.5-1.5-1.5-0.8zm-176.4-22h16.8v15.7H34.2V66.9zm20.8 0h16.8v15.7H55V66.9zm20.8 0h16.8v15.7H75.8V66.9zm-41.6-21h16.8v15.7H34.2V45.9zm20.8 0h16.8v15.7H55V45.9zm20.8 0h16.8v15.7H75.8V45.9zm20.8 0h16.8v15.7H96.6V45.9zm0 21h16.8v15.7H96.6V66.9zm20.8-41.9h16.8v15.7h-16.8V25zm0 20.9h16.8v15.7h-16.8V45.9zm0 21h16.8v15.7h-16.8V66.9z"/>
+      </svg>
+      Docker
+    </div>
+  </div>
+
+  <!-- Main architecture box -->
+  <div class="main-box">
+
+    <!-- Flow row -->
+    <div class="flow-row">
+
+      <!-- User -->
+      <div class="node" style="min-width:90px;">
+        👤<br>사용자 질문
+      </div>
+
+      <div class="arrow">➜</div>
+
+      <!-- Django Frontend -->
+      <div style="text-align:center;">
+        <div class="django-label">Frontend</div>
+        <div class="node" style="background:#0C4B33; color:white; border-color:#0C4B33; min-width:100px;">
+          <svg width="20" height="20" viewBox="0 0 50 50" fill="white" style="vertical-align:middle; margin-right:4px;" xmlns="http://www.w3.org/2000/svg"><path d="M24 2C12 2 2 12 2 24s10 22 22 22 22-10 22-22S36 2 24 2zm4 30c0 4.4-2 7-6.4 7-1.2 0-2.3-.2-3.1-.6V36c.5.3 1.1.4 1.8.4 1.5 0 2.2-.9 2.2-2.8V18H28v14zm5-19.5c-1.4 0-2.5-1.1-2.5-2.5S31.6 7.5 33 7.5s2.5 1.1 2.5 2.5S34.4 12.5 33 12.5z"/></svg>
+          Django
+        </div>
+      </div>
+
+      <div class="arrow">➜</div>
+
+      <!-- FastAPI + LangGraph -->
+      <div class="middle-box flex1">
+        <div class="logo-row">
+          <div class="logo-badge badge-fastapi">
+            ⚡ FastAPI
+          </div>
+          <div class="logo-badge badge-langgraph">
+            🔗 LangGraph
+          </div>
+        </div>
+        <div class="lg-nodes">
+          <div class="lg-node-row">
+            <div class="dot dot-green"></div>
+            <span>질문 분류</span>
+            <div class="logo-badge badge-openai" style="padding:2px 8px; font-size:11px; border-radius:10px; margin-left:auto;">GPT-4-turbo</div>
+          </div>
+          <div class="lg-node-row">
+            <div class="dot dot-orange"></div>
+            <span>하이브리드 검색</span>
+            <div style="display:flex; gap:4px; margin-left:auto;">
+              <div class="logo-badge badge-chroma" style="padding:2px 8px; font-size:10px; border-radius:10px;">ChromaDB</div>
+              <div class="logo-badge badge-bm25" style="padding:2px 8px; font-size:10px; border-radius:10px;">BM25</div>
+            </div>
+          </div>
+          <div class="lg-node-row">
+            <div class="dot dot-green"></div>
+            <span>답변 생성</span>
+            <div class="logo-badge badge-openai" style="padding:2px 8px; font-size:11px; border-radius:10px; margin-left:auto;">GPT-4-turbo</div>
+          </div>
+          <div class="lg-node-row">
+            <div class="dot dot-yellow"></div>
+            <span>서비스센터 조회</span>
+            <div class="logo-badge badge-kakao" style="padding:2px 8px; font-size:10px; border-radius:10px; margin-left:auto;">🗺️ Kakao Map</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow">➜</div>
+
+      <!-- Answer -->
+      <div class="node" style="min-width:80px;">
+        💬<br>답변
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Bottom: logging pipeline -->
+    <div style="text-align:center; font-size:12px; color:#888; margin-bottom:10px;">로그 파이프라인</div>
+    <div class="bottom-row">
+      <div class="infra-badge badge-redis">
+        <svg width="18" height="18" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path fill="#DC382D" d="M16 3L3 9.5l13 6.5 13-6.5L16 3zm-13 7v11l13 6.5V16.5L3 10zm26 0L16 16.5V27L29 20.5V10z"/></svg>
+        Redis Stream
+      </div>
+      <div class="infra-arrow">→</div>
+      <div class="infra-badge badge-celery">
+        🌿 Celery
+      </div>
+      <div class="infra-arrow">→</div>
+      <div class="infra-badge badge-mongo">
+        <svg width="18" height="18" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path fill="#13AA52" d="M15.9 3C11.1 3 7 7.9 7 14c0 4.5 2.2 8.4 5.4 10.6l1 5.4h5.1l1-5.4C22.7 22.4 25 18.5 25 14c0-6.1-4.1-11-9.1-11zm0 20.5c-.6 0-1.1-.1-1.6-.3v-8.9c0-.5.7-.5.7 0v3.4c.3.1.6.2.9.2.3 0 .6-.1.9-.2V15c0-.5.7-.5.7 0v8.2c-.5.2-1 .3-1.6.3z"/></svg>
+        MongoDB
+      </div>
+      <div class="infra-label">(로그 저장)</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
