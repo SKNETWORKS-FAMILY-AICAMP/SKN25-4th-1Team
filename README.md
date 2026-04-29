@@ -229,30 +229,13 @@ Django Session 저장
 
 ### 전체 구조
 
-```
-사용자 브라우저
-      ↓
-Nginx (리버스 프록시)
-      ↓
-Django (Port 8010)
-  — HTML/CSS/JS 프론트엔드
-  — 언어 세션 관리 (selected_language)
-  — 정적/동적 번역 처리 (translate_to_language)
-  — FastAPI 연동 서비스
-      ↓
-FastAPI (Port 8000)
-  — LangGraph AI 서빙
-  — 언어 파라미터 수신 → 번역 파이프라인 실행
-      ↓
-┌──────────────────────────────────────────────────┐
-│  MongoDB   │  ChromaDB + BM25  │  Redis + Celery │
-│         OpenAI API  │  카카오맵 API               │
-└──────────────────────────────────────────────────┘
-```
+![전체 구조](https://raw.githubusercontent.com/SKNETWORKS-FAMILY-AICAMP/SKN25-4th-1Team/hj/architecture1.jpg)
+
 
 ### LangGraph 워크플로우
 
 ![시스템 아키텍처](https://raw.githubusercontent.com/SKNETWORKS-FAMILY-AICAMP/SKN25-4th-1Team/hj/architecture.webp)
+
 
 ### 노드 구성
 
