@@ -317,6 +317,13 @@ SKN25-4th-1Team/
 ```
 
 ---
+## 🎬 시연 영상
+
+[![Smart CS 시연 영상](https://img.youtube.com/vi/유튜브ID/0.jpg)](https://www.youtube.com/watch?v=유튜브ID)
+
+---
+
+---
 
 ## 🔑 핵심 구현 내용
 
