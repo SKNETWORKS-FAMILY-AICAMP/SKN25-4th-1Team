@@ -234,7 +234,7 @@ Django Session 저장
 
 ### LangGraph 워크플로우
 
-![시스템 아키텍처](https://raw.githubusercontent.com/SKNETWORKS-FAMILY-AICAMP/SKN25-4th-1Team/hj/architecture.webp)
+![시스템 아키텍처](https://raw.githubusercontent.com/SKNETWORKS-FAMILY-AICAMP/SKN25-4th-1Team/hj/repair_system.jpg)
 
 
 ### 노드 구성
