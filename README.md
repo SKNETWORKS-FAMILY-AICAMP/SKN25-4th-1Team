@@ -252,30 +252,7 @@ FastAPI (Port 8000)
 
 ### LangGraph 워크플로우
 
-```
-사용자 질문 수신
-      ↓
-translate_input_node  ← 영어 선택 시 한국어로 번역
-      ↓
-route_question  →  인사/잡담     →  chat_node
-              →  기기 증상 문의  →  retrieve_node
-              →  센터 방문      →  nearest_center_node
-      ↓ (기기 증상 문의 경로)
-retrieve_node  →  LLM 쿼리 변환 + ChromaDB + BM25 하이브리드 검색
-      ↓
-route_issue_type  →  SW 이슈  →  generate_node
-                →  HW 이슈  →  self_repair_classifier_node
-                →  Fallback →  fallback_node
-      ↓ (HW 경로)
-self_repair_classifier_node
-      ↓
-route_after_self_repair_check  →  자가수리 가능  →  self_repair_guide_node
-                              →  수리 불가/방문 →  nearest_center_node
-      ↓
-translate_output_node  ← 영어 선택 시 영어로 재번역
-      ↓
-최종 답변 반환
-```
+![시스템 아키텍처](https://raw.githubusercontent.com/SKNETWORKS-FAMILY-AICAMP/SKN25-4th-1Team/hj/architecture.webp)
 
 ### 노드 구성
 
