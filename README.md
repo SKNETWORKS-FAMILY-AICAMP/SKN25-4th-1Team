@@ -229,7 +229,7 @@ Django Session 저장
 
 ### 전체 구조
 
-![전체 구조](https://raw.githubusercontent.com/SKNETWORKS-FAMILY-AICAMP/SKN25-4th-1Team/hj/architecture1.jpg)
+![전체 구조](https://raw.githubusercontent.com/SKNETWORKS-FAMILY-AICAMP/SKN25-4th-1Team/hj/architecture.jpg)
 
 
 ### LangGraph 워크플로우
